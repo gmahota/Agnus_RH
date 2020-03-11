@@ -3,6 +3,7 @@
     <v-card-title>
       Employees
       <v-spacer></v-spacer>
+
       <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
       <v-icon color="primary" @click="dialog = !dialog">add</v-icon>
       <v-dialog v-model="dialog">
@@ -13,7 +14,7 @@
 
           <v-card-text>
             <v-flex column>
-              <v-row >
+              <v-row>
                 <v-col>
                   <v-text-field v-model="employeeModel.code" label="Code"></v-text-field>
                 </v-col>
@@ -30,9 +31,7 @@
                   <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
                 </v-col>
               </v-row>
-              <v-row>
-
-              </v-row>
+              <v-row></v-row>
               <v-row>
                 <v-col cols="12" sm="12" md="6">
                   <v-select
@@ -78,35 +77,56 @@
     </v-card-title>
 
     <v-card-text class="pa-0">
-      <v-data-table
-        :headers="headers"
-        :items="Employees"
-        :search="search"
-        single-select
-        :items-per-page="20"
-        item-key="code"
-        class="elevation-0"
-        :loading="loading"
-        loading-text="Loading products. Please wait"
-      >
-        <template slot="headerCell" slot-scope="{ header }">
-          <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
-        </template>
-        <template slot="items" slot-scope="{ item }">
-          <td>{{ item.code }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.email }}</td>
-          <td>{{ item.phoneNumber }}</td>
-          <td>{{ item.location }}</td>
-          <td>{{ item.status }}</td>
-          <td class="text-xs-right">
-            <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-            <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
-          </td>
-        </template>
-      </v-data-table>
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="location"
+            :items="Location"
+            clearable
+            label="Location"
+            return-object
+            v-validate="'required'"
+            data-vv-name="employeeModel.type"
+            item-text="description"
+            item-value="code"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-data-table
+          :headers="headers"
+          :items="Employees"
+          :search="search"
+          single-select
+          :items-per-page="20"
+          item-key="code"
+          class="elevation-0"
+          :loading="loading"
+          loading-text="Loading products. Please wait"
+        >
+          <template slot="headerCell" slot-scope="{ header }">
+            <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+          </template>
+          <template
+            slot="items"
+            slot-scope="{ item }"
+            v-if="!location || item.location === location.code"
+          >
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.phoneNumber }}</td>
+            <td>{{ item.location }}</td>
+            <td>{{ item.status }}</td>
+            <td class="text-xs-right">
+              <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+              <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            </td>
+          </template>
+        </v-data-table>
 
-      <v-divider></v-divider>
+        <v-divider></v-divider>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
@@ -122,6 +142,7 @@ export default {
       location: null,
       status: null
     },
+    location: "",
     Location: [
       {
         code: "Maputo",
