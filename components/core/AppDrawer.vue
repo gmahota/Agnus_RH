@@ -30,7 +30,7 @@
               />
             </v-list-tile-avatar>
             <v-list-tile-title class="title">
-              Vuetify MD
+              IClock
             </v-list-tile-title>
           </v-list-tile>
         </v-list>
@@ -82,8 +82,18 @@
           },
            {
             to: '/employees',
-            icon: 'mdi-account',
+            icon: 'mdi-account-multiple',
             text: 'Employees'
+          },
+           {
+            to: '/reports/quick',
+            icon: 'mdi-file-document-outline',
+            text: 'Quick Reports'
+          },
+          {
+            to: '/admins',
+            icon: 'mdi-account-multiple',
+            text: 'Admins'
           },
           // {
           //   to: '/user-profile',

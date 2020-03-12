@@ -86,7 +86,7 @@
             label="Location"
             return-object
             v-validate="'required'"
-            data-vv-name="employeeModel.type"
+            data-vv-name="location"
             item-text="description"
             item-value="code"
           ></v-select>
