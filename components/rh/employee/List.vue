@@ -134,7 +134,22 @@
 export default {
   data: () => ({
     search: "",
-    Employees: [],
+    Employees: [{
+      code: "C001",
+        name: "Guimarães Mahota",
+        email: "guimaraesmahota@gmail.com",
+        phoneNumber:"+258849535156",
+        location: "Sede",
+        status: "Active"
+    },
+    {
+      code: "C002",
+        name: "Nelson Moiane",
+        email: "nelson.moiane@gmail.com",
+        phoneNumber:"+2582704988",
+        location: "Posto2",
+        status: "Active"
+    }],
     employeeModel: {
       code: "",
       name: "",
@@ -145,11 +160,11 @@ export default {
     location: "",
     Location: [
       {
-        code: "Maputo",
+        code: "Sede",
         description: "Sede - Maputo"
       },
       {
-        code: "Maputo2",
+        code: "Posto2",
         description: "Posto 2 - Maputo"
       }
     ],

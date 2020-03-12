@@ -122,6 +122,20 @@ export default {
         totalDayEarly:2,
         totalDayLate:1,
         totalAbsent:1
+      },
+      {
+        period: 'This Week',
+        name: "Nelson Moaine",
+        monday: "Absent",
+        tuesday: "Late",
+        wednesday: "Late",
+        thursday: "Early",
+        friday: "",
+        saturday: "",
+        sunday: "",
+        totalDayEarly:1,
+        totalDayLate:2,
+        totalAbsent:1
       }
     ],
     employeeModel: {
