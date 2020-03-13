@@ -239,9 +239,7 @@ export default {
 
   created() {
     //this.postData();
-    this.getData();
-
-    
+    this.getData();   
   },
 
   methods: {
@@ -275,6 +273,7 @@ export default {
       axios
         .get("https://mahotacrm.firebaseio.com/tests.json")
         .then(response => { 
+          this.items = [];
           for (const key in response.data) {
             this.items.push({ ...response.data[key] , id: key})
           }
