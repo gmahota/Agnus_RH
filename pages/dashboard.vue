@@ -16,7 +16,7 @@
           color="info"
           type="Line"
         >
-          <h4 class="title font-weight-light">Daily Sales</h4>
+          <h4 class="title font-weight-light">Daily Early</h4>
           <p class="category d-inline-flex font-weight-light">
             <v-icon
               color="green"
@@ -25,7 +25,7 @@
               mdi-arrow-up
             </v-icon>
             <span class="green--text">55%</span>&nbsp;
-            increase in today's sales
+            increase in today's early
           </p>
 
           <template slot="actions">
@@ -51,8 +51,8 @@
           color="red"
           type="Bar"
         >
-          <h4 class="title font-weight-light">Email Subscription</h4>
-          <p class="category d-inline-flex font-weight-light">Last Campaign Performance</p>
+          <h4 class="title font-weight-light">Time Pick</h4>
+          <p class="category d-inline-flex font-weight-light">Anual Report - IClock</p>
 
           <template slot="actions">
             <v-icon
@@ -76,8 +76,8 @@
           color="green"
           type="Line"
         >
-          <h3 class="title font-weight-light">Completed Tasks</h3>
-          <p class="category d-inline-flex font-weight-light">Last Last Campaign Performance</p>
+          <h3 class="title font-weight-light">Absenteeism </h3>
+          <p class="category d-inline-flex font-weight-light">Last Last Campaign Absenteeism</p>
 
           <template slot="actions">
             <v-icon
@@ -99,8 +99,9 @@
         <material-stats-card
           color="green"
           icon="mdi-store"
-          title="Revenue"
-          value="$34,245"
+          title="Early"
+          value="75"
+          small-value="%"
           sub-icon="mdi-calendar"
           sub-text="Last 24 Hours"
         />
@@ -114,12 +115,12 @@
         <material-stats-card
           color="orange"
           icon="mdi-content-copy"
-          title="Used Space"
-          value="49/50"
-          small-value="GB"
+          title="Late"
+          value="10"
+          small-value="%"
           sub-icon="mdi-alert"
           sub-icon-color="error"
-          sub-text="Get More Space..."
+          sub-text="..."
           sub-text-color="text-primary"
         />
       </v-flex>
@@ -132,10 +133,11 @@
         <material-stats-card
           color="red"
           icon="mdi-information-outline"
-          title="Fixed Issues"
-          value="75"
+          title="Absent"
+          value="15"
+          small-value="%"
           sub-icon="mdi-tag"
-          sub-text="Tracked from Github"
+          sub-text="..."
         />
       </v-flex>
       <v-flex
@@ -146,8 +148,8 @@
       >
         <material-stats-card
           color="info"
-          icon="mdi-twitter"
-          title="Followers"
+          icon="mdi-account"
+          title="Time Pick"
           value="+245"
           sub-icon="mdi-update"
           sub-text="Just Updated"
@@ -160,7 +162,7 @@
         <material-card
           color="orange"
           title="Employee Stats"
-          text="New employees on 15th September, 2016"
+          text="New employees on 13th March, 2020"
         >
           <v-data-table
             :headers="headers"
@@ -182,7 +184,7 @@
             >
               <td>{{ index + 1 }}</td>
               <td>{{ item.name }}</td>
-              <td class="text-xs-right">{{ item.salary }}</td>
+              <td class="text-xs-right">{{ item.location }}</td>
               <td class="text-xs-right">{{ item.country }}</td>
               <td class="text-xs-right">{{ item.city }}</td>
             </template>
@@ -237,7 +239,7 @@
                     />
                   </v-list-tile-action>
                   <v-list-tile-title>
-                    Sign contract for "What are conference organized afraid of?"
+                    Sincronizar Filial de Xai-xai
                   </v-list-tile-title>
                   <div class="d-flex">
                     <v-tooltip
@@ -278,7 +280,7 @@
                     />
                   </v-list-tile-action>
                   <v-list-tile-title>
-                    Lines From Great Russian Literature? Or E-mails From My Boss?
+                    Sincronizar Filial da Beira
                   </v-list-tile-title>
                   <div class="d-flex">
                     <v-tooltip
@@ -318,7 +320,7 @@
                     />
                   </v-list-tile-action>
                   <v-list-tile-title>
-                    Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
+                    Sincronizar Filial da Nampula
                   </v-list-tile-title>
                   <div class="d-flex">
                     <v-tooltip
@@ -454,8 +456,8 @@
           },
           {
             sortable: false,
-            text: 'Salary',
-            value: 'salary',
+            text: 'Localition',
+            value: 'location',
             align: 'right'
           },
           {
@@ -474,29 +476,34 @@
         items: [
           {
             name: 'Dakota Rice',
-            country: 'Niger',
-            city: 'Oud-Tunrhout',
+            country: 'Mozambique',
+            city: 'Sofala',
+            location: 'Sofala - Localizao 1',
             salary: '$35,738'
           },
           {
             name: 'Minerva Hooper',
-            country: 'Curaçao',
-            city: 'Sinaai-Waas',
+            country: 'Mozambique',
+            city: 'Nampula',
+            location: 'Nampula',
             salary: '$23,738'
           }, {
             name: 'Sage Rodriguez',
-            country: 'Netherlands',
-            city: 'Overland Park',
+            country: 'Mozambique',
+            city: 'Xai-xai',
+            location: 'Xai-xai',
             salary: '$56,142'
           }, {
             name: 'Philip Chanley',
-            country: 'Korea, South',
-            city: 'Gloucester',
+            country: 'Mozambique',
+            city: 'Maputo',
+            location: 'Maputo - Sede',
             salary: '$38,735'
           }, {
             name: 'Doris Greene',
             country: 'Malawi',
-            city: 'Feldkirchen in Kārnten',
+            city: 'Matola - Filial 1',
+            location: 'Matola',
             salary: '$63,542'
           }
         ],

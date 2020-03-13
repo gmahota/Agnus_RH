@@ -20,11 +20,11 @@
       {{ (new Date()).getFullYear() }}
       <a
         href="https://www.creative-tim.com/"
-        target="_blank">Creative Tim</a>, made with
+        target="_blank">Koila Team</a>, made with
       <v-icon
         color="tertiary"
         size="17">mdi-heart</v-icon>
-      for a better web
+      for a better IClock
     </span>
   </v-footer>
 </template>
