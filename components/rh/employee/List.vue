@@ -146,7 +146,7 @@ export default {
       code: "C002",
         name: "Nelson Moiane",
         email: "nelson.moiane@gmail.com",
-        phoneNumber:"+2582704988",
+        phoneNumber:"+258282704988",
         location: "Posto2",
         status: "Active"
     }],
