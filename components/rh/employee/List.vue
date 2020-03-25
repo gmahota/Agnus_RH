@@ -134,24 +134,7 @@
 export default {
   data: () => ({
     search: "",
-    Employees: [
-      {
-        code: "C001",
-        name: "Guimarães Mahota",
-        email: "guimaraesmahota@gmail.com",
-        phoneNumber: "+258849535156",
-        location: "Sede",
-        status: "Active"
-      },
-      {
-        code: "C002",
-        name: "Nelson Moiane",
-        email: "nelson.moiane@gmail.com",
-        phoneNumber:"+258282704988",
-        location: "Posto2",
-        status: "Active"
-      }
-    ],
+    Employees: [],
     employeeModel: {
       code: "",
       name: "",
@@ -190,12 +173,12 @@ export default {
     formTitle: "Employees Data",
     loading: false,
     headers: [
-      { text: "Code", value: "ID" },
-      { text: "Name", value: "Nome" },
-      { text: "Email Adrress", value: "email" },
-      { text: "Phone Number", value: "phoneNumber" },
-      { text: "Location", value: "Localização" },
-      { text: "Status", value: "Posição" },
+      { text: "Codigo", value: "ID" },
+      { text: "Nome", value: "Nome" },
+      { text: "Telefone", value: "phoneNumber" },
+      { text: "Localização", value: "Localização" },
+      { text: "Posição", value: "Posição" },
+      { text: "Observação ", value: "Observação" },
       { text: "Actions", value: "action", sortable: false }
     ]
   }),
