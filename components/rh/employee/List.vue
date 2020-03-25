@@ -189,9 +189,11 @@ export default {
         .get("https://mahotacrm.firebaseio.com/funcionarios.json")
         .then(response => {
           this.Employees = [];
-          for (const key in response.data) {
-            this.Employees.push({ ...response.data[key] , id: key})
-          }
+          Employees = response.data;
+
+          // for (const key in response.data) {
+          //   this.Employees.push({ ...response.data[key] , id: key})
+          // }
         })
         .catch(error => console.log(error));
     },
@@ -245,6 +247,8 @@ export default {
 
     async initData() {
       this.loading = !this.loading;
+
+      this.getData();
       //this.products = await this.$store.dispatch("getDataAsync", "employees");
       this.loading = !this.loading;
 
@@ -266,7 +270,7 @@ export default {
   created() {
     this.initData();
 
-    this.getData();
+
   }
 };
 </script>
