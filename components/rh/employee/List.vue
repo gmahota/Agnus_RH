@@ -82,12 +82,12 @@
               v-model="location"
               :items="Location"
               clearable
-              label="Location"
+              label="Localização"
               return-object
               v-validate="'required'"
               data-vv-name="location"
-              item-text="description"
-              item-value="code"
+              item-text="nome"
+              item-value="ID"
             ></v-select>
           </v-col>
         </v-row>
@@ -97,7 +97,7 @@
             :items="Employees"
             :search="search"
             single-select
-            :items-per-page="20"
+            :items-per-page="25"
             item-key="code"
             class="elevation-0"
             :loading="loading"
@@ -109,14 +109,15 @@
             <template
               slot="items"
               slot-scope="{ item }"
-              v-if="!location || item.location === location.code"
+              v-if="!location || item.Localização === location.nome"
             >
-              <td>{{ item.code }}</td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.email }}</td>
-              <td>{{ item.phoneNumber }}</td>
-              <td>{{ item.location }}</td>
-              <td>{{ item.status }}</td>
+              <td>{{ item.ID }}</td>
+              <td>{{ item.Nome }}</td>
+              <td>{{ item.Telefone }}</td>
+              <td>{{ item.Localização }}</td>
+              <td>{{ item.Posição }}</td>
+              <td>{{ item.Observação }}</td>
+
               <td class="text-xs-right">
                 <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
                 <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
@@ -131,6 +132,8 @@
   </v-container>
 </template>
 <script>
+import axios from "axios";
+
 export default {
   data: () => ({
     search: "",
@@ -175,7 +178,7 @@ export default {
     headers: [
       { text: "Codigo", value: "ID" },
       { text: "Nome", value: "Nome" },
-      { text: "Telefone", value: "phoneNumber" },
+      { text: "Telefone", value: "Telefone" },
       { text: "Localização", value: "Localização" },
       { text: "Posição", value: "Posição" },
       { text: "Observação ", value: "Observação" },
@@ -189,7 +192,19 @@ export default {
         .get("https://mahotacrm.firebaseio.com/funcionarios.json")
         .then(response => {
           this.Employees = [];
-          Employees = response.data;
+          this.Employees = response.data;
+
+          // for (const key in response.data) {
+          //   this.Employees.push({ ...response.data[key] , id: key})
+          // }
+        })
+        .catch(error => console.log(error));
+
+        axios
+        .get("https://mahotacrm.firebaseio.com/localizacoes.json")
+        .then(response => {
+          this.Location = [];
+          this.Location = response.data;
 
           // for (const key in response.data) {
           //   this.Employees.push({ ...response.data[key] , id: key})
@@ -247,23 +262,8 @@ export default {
 
     async initData() {
       this.loading = !this.loading;
-
       this.getData();
-      //this.products = await this.$store.dispatch("getDataAsync", "employees");
       this.loading = !this.loading;
-
-      // this.product_types = await this.$store.dispatch(
-      //   "getDataAsync",
-      //   "products/types"
-      // );
-      // this.product_suppliers = await this.$store.dispatch(
-      //   "getDataAsync",
-      //   "products/suppliers"
-      // );
-      // this.product_statuses = await this.$store.dispatch(
-      //   "getDataAsync",
-      //   "products/statuses"
-      // );
     }
   },
 
