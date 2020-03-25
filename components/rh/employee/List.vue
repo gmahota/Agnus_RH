@@ -190,17 +190,29 @@ export default {
     formTitle: "Employees Data",
     loading: false,
     headers: [
-      { text: "Code", value: "code" },
-      { text: "Name", value: "name" },
+      { text: "Code", value: "ID" },
+      { text: "Name", value: "Nome" },
       { text: "Email Adrress", value: "email" },
       { text: "Phone Number", value: "phoneNumber" },
-      { text: "Location", value: "location" },
-      { text: "Status", value: "status" },
+      { text: "Location", value: "Localização" },
+      { text: "Status", value: "Posição" },
       { text: "Actions", value: "action", sortable: false }
     ]
   }),
 
   methods: {
+    async getData() {
+      axios
+        .get("https://mahotacrm.firebaseio.com/funcionarios.json")
+        .then(response => {
+          this.Employees = [];
+          for (const key in response.data) {
+            this.Employees.push({ ...response.data[key] , id: key})
+          }
+        })
+        .catch(error => console.log(error));
+    },
+
     detailsItem(value) {
       this.Employees.splice(value);
     },
@@ -270,6 +282,8 @@ export default {
 
   created() {
     this.initData();
+
+    this.getData();
   }
 };
 </script>
