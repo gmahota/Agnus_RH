@@ -1,7 +1,18 @@
 import VuetifyLoaderPlugin from 'vuetify-loader/lib/plugin'
 import pkg from './package'
+import serveStatic from 'serve-static'
 
 export default {
+  serverMiddleware: [
+    // Will register redirect-ssl npm package
+    '~/api/logger',
+
+    // Will register file from project api directory to handle /api/* requires
+    { path: '/api', handler: '~/api/index.js' },
+
+    // We can create custom instances too
+    //{ path: '/static2', handler: serveStatic(__dirname + '/static2') }
+  ],
   mode: 'universal',
 
   /*

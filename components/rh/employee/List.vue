@@ -1,135 +1,135 @@
 <template>
-  <v-container grid-list-xs>
-    <v-card>
-      <v-card-title>
-        Employees
-        <v-spacer></v-spacer>
+<v-layout>
+  <v-card>
+    <v-card-title>
+      Employees
+      <v-spacer></v-spacer>
 
-        <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
-        <v-icon color="primary" @click="dialog = !dialog">add</v-icon>
-        <v-dialog v-model="dialog">
-          <v-card>
-            <v-card-title>
-              <span class="headline">{{ formTitle }}</span>
-            </v-card-title>
+      <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+      <v-icon color="primary" @click="dialog = !dialog">add</v-icon>
+      <v-dialog v-model="dialog">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ formTitle }}</span>
+          </v-card-title>
 
-            <v-card-text>
-              <v-flex column>
-                <v-row>
-                  <v-col>
-                    <v-text-field v-model="employeeModel.code" label="Code"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field v-model="employeeModel.name" label="Name"></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row></v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field v-model="employeeModel.email" label="Email"></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-spacer></v-spacer>
+          <v-card-text>
+            <v-flex column>
+              <v-row>
+                <v-col>
+                  <v-text-field v-model="employeeModel.code" label="Code"></v-text-field>
+                </v-col>
+                <v-col>
+                  <v-text-field v-model="employeeModel.name" label="Name"></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row></v-row>
+              <v-row>
+                <v-col>
+                  <v-text-field v-model="employeeModel.email" label="Email"></v-text-field>
+                </v-col>
+                <v-col>
+                  <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-spacer></v-spacer>
+                <v-select
+                  v-model="employeeModel.location"
+                  :items="Location"
+                  clearable
+                  label="Location"
+                  return-object
+                  v-validate="'required'"
+                  data-vv-name="employeeModel.type"
+                  required
+                  item-text="description"
+                  item-value="code"
+                ></v-select>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="6">
                   <v-select
-                    v-model="employeeModel.location"
-                    :items="Location"
+                    v-model="employeeModel.status"
+                    :items="Status"
                     clearable
-                    label="Location"
+                    label="Status"
                     return-object
                     v-validate="'required'"
-                    data-vv-name="employeeModel.type"
+                    data-vv-name="employeeModel.status"
                     required
                     item-text="description"
                     item-value="code"
                   ></v-select>
-                </v-row>
-                <v-row>
-                  <v-col cols="12" sm="12" md="6">
-                    <v-select
-                      v-model="employeeModel.status"
-                      :items="Status"
-                      clearable
-                      label="Status"
-                      return-object
-                      v-validate="'required'"
-                      data-vv-name="employeeModel.status"
-                      required
-                      item-text="description"
-                      item-value="code"
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-flex>
-            </v-card-text>
+                </v-col>
+              </v-row>
+            </v-flex>
+          </v-card-text>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
-              <v-btn color="blue darken-1" text @click="save">Gravar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
+            <v-btn color="blue darken-1" text @click="save">Gravar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card-title>
 
-      <v-card-text class="pa-0">
-        <v-row>
-          <v-col>
-            <v-select
-              v-model="location"
-              :items="Location"
-              clearable
-              label="Localização"
-              return-object
-              v-validate="'required'"
-              data-vv-name="location"
-              item-text="nome"
-              item-value="ID"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-data-table
-            :headers="headers"
-            :items="Employees"
-            :search="search"
-            single-select
-            :items-per-page="25"
-            item-key="code"
-            class="elevation-0"
-            :loading="loading"
-            loading-text="Loading products. Please wait"
+    <v-card-text class="pa-0">
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="location"
+            :items="Location"
+            clearable
+            label="Localização"
+            return-object
+            v-validate="'required'"
+            data-vv-name="location"
+            item-text="nome"
+            item-value="ID"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-data-table
+          :headers="headers"
+          :items="Employees"
+          :search="search"
+          single-select
+          :items-per-page="25"
+          item-key="code"
+          class="elevation-0"
+          :loading="loading"
+          loading-text="Loading products. Please wait"
+        >
+          <template slot="headerCell" slot-scope="{ header }">
+            <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+          </template>
+          <template
+            slot="items"
+            slot-scope="{ item }"
+            v-if="!location || item.Localização === location.nome"
           >
-            <template slot="headerCell" slot-scope="{ header }">
-              <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
-            </template>
-            <template
-              slot="items"
-              slot-scope="{ item }"
-              v-if="!location || item.Localização === location.nome"
-            >
-              <td>{{ item.ID }}</td>
-              <td>{{ item.Nome }}</td>
-              <td>{{ item.Telefone }}</td>
-              <td>{{ item.Localização }}</td>
-              <td>{{ item.Posição }}</td>
-              <td>{{ item.Observação }}</td>
+            <td>{{ item.ID }}</td>
+            <td>{{ item.Nome }}</td>
+            <td>{{ item.Telefone }}</td>
+            <td>{{ item.Localização }}</td>
+            <td>{{ item.Posição }}</td>
+            <td>{{ item.Observação }}</td>
 
-              <td class="text-xs-right">
-                <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-                <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
-              </td>
-            </template>
-          </v-data-table>
+            <td class="text-xs-right">
+              <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+              <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            </td>
+          </template>
+        </v-data-table>
 
-          <v-divider></v-divider>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-container>
+        <v-divider></v-divider>
+      </v-row>
+    </v-card-text>
+  </v-card>
+  </v-layout>
 </template>
 <script>
 import axios from "axios";
@@ -200,7 +200,7 @@ export default {
         })
         .catch(error => console.log(error));
 
-        axios
+      axios
         .get("https://mahotacrm.firebaseio.com/localizacoes.json")
         .then(response => {
           this.Location = [];
@@ -269,8 +269,6 @@ export default {
 
   created() {
     this.initData();
-
-
   }
 };
 </script>

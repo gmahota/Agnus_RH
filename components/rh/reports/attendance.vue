@@ -74,78 +74,21 @@
           :loading="loading"
           loading-text="Loading products. Please wait"
         >
-          <template slot="headerCell" slot-scope="{ header }">
-            <tr>
-              <th>
-                <span
-                  class="subheading font-weight-light text--darken-3"
-                  v-text="slipt(header.text,0)"
-                />
-              </th>
-            </tr>
-            <tr>
-              <th>
-                <span
-                  class="subheading font-weight-light text--darken-3"
-                  v-text="slipt(header.text,1)"
-                />
-              </th>
-            </tr>
-          </template>
           <template slot="items" slot-scope="{ item }">
-            <td>{{ item.name }}</td>
-            <td>
-              <v-icon
-                small
-                :color="getColor(item.monday)"
-                v-if="!item.monday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
+            <td>{{ item.Localizacao }}</td>
+            <td>{{ getDate(item.date)}}
+
             </td>
             <td>
-              <v-icon
-                small
-                :color="getColor(item.tuesday)"
-                v-if="!item.tuesday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
+              {{ item.funcionario }}
             </td>
             <td>
-              <v-icon
-                small
-                :color="getColor(item.wednesday)"
-                v-if="!item.wednesday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
+               {{ item.telefone }}
             </td>
             <td>
-              <v-icon
-                small
-                :color="getColor(item.thursday)"
-                v-if="!item.thursday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
+               {{ item.tipo }}
             </td>
-            <td>
-              <v-icon
-                small
-                :color="getColor(item.friday)"
-                v-if="!item.friday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
-            </td>
-            <td>
-              <v-icon
-                small
-                :color="getColor(item.saturday)"
-                v-if="!item.saturday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
-            </td>
-            <td>
-              <v-icon
-                small
-                :color="getColor(item.sunday)"
-                v-if="!item.sunday ==''"
-              >mdi-checkbox-blank-circle</v-icon>
-            </td>
-            <td>{{ item.totalDayEarly }}</td>
-            <td>{{ item.totalDayLate }}</td>
-            <td>{{ item.totalAbsent }}</td>
+
           </template>
         </v-data-table>
 
@@ -161,34 +104,7 @@ export default {
   data: () => ({
     search: "",
     items: [
-      // {
-      //   period: "This Week",
-      //   name: "Guimarães Mahota",
-      //   monday: "Early",
-      //   tuesday: "Early",
-      //   wednesday: "Late",
-      //   thursday: "Absent",
-      //   friday: "",
-      //   saturday: "",
-      //   sunday: "",
-      //   totalDayEarly: 2,
-      //   totalDayLate: 1,
-      //   totalAbsent: 1
-      // },
-      // {
-      //   period: "This Week",
-      //   name: "Nelson Moaine",
-      //   monday: "Absent",
-      //   tuesday: "Late",
-      //   wednesday: "Late",
-      //   thursday: "Early",
-      //   friday: "",
-      //   saturday: "",
-      //   sunday: "",
-      //   totalDayEarly: 1,
-      //   totalDayLate: 2,
-      //   totalAbsent: 1
-      // }
+
     ],
     employeeModel: {
       code: "",
@@ -228,17 +144,11 @@ export default {
     formTitle: "Employees Data",
     loading: false,
     headers: [
-      { text: "Employ Name", value: "name" },
-      { text: "Segunda 30/3/2020", value: "segunda" },
-      { text: "Terça 31/3/2020", value: "terça" },
-      { text: "Quarta 01/4/2020", value: "quarta" },
-      { text: "Quinta 02/4/2020", value: "quinta" },
-      { text: "Sexta 03/4/2020", value: "sexta" },
-      { text: "Sabado 04/4/2020", value: "sabado" },
-      { text: "Domingo 05/4/2020", value: "domingo" },
-      { text: "TotalDays Early", value: "totalEarly" },
-      { text: "TotalDays Late", value: "totalLate" },
-      { text: "TotalDays Absent", value: "totalAbsent" }
+      { text: "Localizacao", value: "localizacao" },
+      { text: "Data", value: "date" },
+      { text: "Funcionario", value: "funcionario" },
+      { text: "Telefone", value: "telefone" },
+      { text: "Tipo", value: "tipo" }
     ]
   }),
 
@@ -254,7 +164,7 @@ export default {
 
     async postData() {
       axios
-        .post("https://mahotacrm.firebaseio.com/tests.json", {
+        .post("https://mahotacrm.firebaseio.com/attendance.json", {
           period: "This Week",
           name: "Guimarães Mahota",
           monday: "Early",
@@ -276,11 +186,12 @@ export default {
 
     async getData() {
       axios
-        .get("https://mahotacrm.firebaseio.com/tests.json")
+        .get("https://mahotacrm.firebaseio.com/attendance.json")
         .then(response => {
           this.items = [];
           for (const key in response.data) {
             this.items.push({ ...response.data[key], id: key });
+
           }
         })
         .catch(error => console.log(error));
@@ -319,7 +230,13 @@ export default {
         case "Faltou":
           return "danger";
       }
-    }
+    },
+     getDate(item) {
+      return new Date(2020, item.month, item.date, item.hours, item.minutes, item.seconds,997).toUTCString()
+     },
+     getFuncionario(item){
+
+     }
   }
 };
 </script>
