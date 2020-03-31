@@ -91,10 +91,15 @@
             text: 'Quick Reports'
           },
           {
-            to: '/admins',
-            icon: 'mdi-account-multiple',
-            text: 'Admins'
+            to: '/reports/attendance',
+            icon: 'mdi-clipboard-outline',
+            text: 'Attendance'
           },
+          // {
+          //   to: '/admins',
+          //   icon: 'mdi-account-multiple',
+          //   text: 'Admins'
+          // },
           // {
           //   to: '/user-profile',
           //   icon: 'mdi-account',

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      Quick Reports
+      Attendance
       <v-spacer></v-spacer>
     </v-card-title>
 
@@ -59,7 +59,7 @@
           </label>
         </v-col>
         <v-col>
-          <v-btn small style="height:24px" color="primary">Download</v-btn>
+          <v-btn small style="height:24px" color="primary" @click="createUser">Download</v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -236,7 +236,21 @@ export default {
      },
      getFuncionario(item){
 
-     }
+     },
+
+     async createUser() {
+      try {
+        console.log("Foo")
+        await this.$fireAuth.createUserWithEmailAndPassword(
+          'foo@foo.foo',
+          'test'
+        )
+      } catch (e) {
+        handleError(e)
+      }
+    }
+
+
   }
 };
 </script>
