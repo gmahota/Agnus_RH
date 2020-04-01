@@ -55,25 +55,7 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    "@nuxtjs/axios",
-    [
-      "@nuxtjs/firebase",
-      {
-        config: {
-          apiKey: "AIzaSyDeQxXFQ4sH0yL4_nF4bK2YuR3AQ2liQPA",
-          authDomain: "mahotacrm.firebaseapp.com",
-          databaseURL: "https://mahotacrm.firebaseio.com",
-          projectId: "mahotacrm",
-          storageBucket: "mahotacrm.appspot.com",
-          messagingSenderId: "703802478357",
-          appId: "1:703802478357:web:67d8f480e01044fa",
-          measurementId: "G-7PRWY44TTV"
-        },
-        services: {
-          auth: true // Just as example. Can be any other service.
-        }
-      }
-    ]
+    "@nuxtjs/axios"
   ],
   /*
    ** Axios module configuration
