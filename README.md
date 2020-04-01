@@ -67,3 +67,8 @@ Vuetify is developed exactly according to Material Design spec. Every component 
 - [NuxtJs](https://nuxtjs.org/) for the wonderful vue framework <3
 - [Vuetify](https://vuetifyjs.com/en/) for the beautiful vue framework UI
 - [Vuetify Material Theme](https://www.creative-tim.com/product/vuetify-material-dashboard?ref=vuetifyjs.com) for the beautiful work realized by [Creative Tim](https://www.creative-tim.com/)
+
+
+Por ver: 
+"firebase": "^7.9.3",
+"firebase-admin": "^8.10.0",
