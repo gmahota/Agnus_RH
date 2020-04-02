@@ -2,7 +2,6 @@
 <v-layout>
   <v-card>
     <v-card-title>
-      Employees
       <v-spacer></v-spacer>
 
       <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
@@ -43,8 +42,7 @@
                   v-validate="'required'"
                   data-vv-name="employeeModel.type"
                   required
-                  item-text="description"
-                  item-value="code"
+                  item-text="ID"
                 ></v-select>
               </v-row>
               <v-row>
@@ -86,8 +84,8 @@
             return-object
             v-validate="'required'"
             data-vv-name="location"
-            item-text="nome"
-            item-value="ID"
+            item-text="description"
+            item-value="code"
           ></v-select>
         </v-col>
       </v-row>
@@ -145,7 +143,6 @@ export default {
       location: null,
       status: null
     },
-    location: "",
     Location: [
       {
         code: "Sede",
@@ -191,27 +188,28 @@ export default {
       axios
         .get("https://mahotacrm.firebaseio.com/funcionarios.json")
         .then(response => {
-          this.Employees = [];
           this.Employees = response.data;
-
-          // for (const key in response.data) {
-          //   this.Employees.push({ ...response.data[key] , id: key})
-          // }
+          console.log('The employee struture is: ', response.data[0]);
         })
         .catch(error => console.log(error));
 
       axios
         .get("https://mahotacrm.firebaseio.com/localizacoes.json")
         .then(response => {
-          this.Location = [];
           this.Location = response.data;
-
-          // for (const key in response.data) {
-          //   this.Employees.push({ ...response.data[key] , id: key})
-          // }
         })
         .catch(error => console.log(error));
     },
+
+    async putData(data) {
+      await axios
+        .put(`https://mahotacrm.firebaseio.com/funcionarios/${this.Employees.length}.json`, data)
+        .then(response => {
+          console.log('The newrly created data is: ', response);
+        })
+        .catch(error => console.log(error));
+    },
+
 
     detailsItem(value) {
       this.Employees.splice(value);
@@ -239,23 +237,28 @@ export default {
     },
 
     async save() {
-      let created_employee = {
-        code: this.employeeModel.code,
-        name: this.employeeModel.name,
+      let post_employee = {
+        "Data de Início": '',
+        "Data de Término": '',
+        "Colocação": '',
+        ID: this.employeeModel.code,
+        Nome: this.employeeModel.name,
         email: this.employeeModel.email,
         phoneNumber: this.employeeModel.phoneNumber,
-        location: this.employeeModel.location.code,
-        status: this.employeeModel.status.code
+        "Localização": this.employeeModel.location.code,
+        status: this.employeeModel.status.code,
+        Nr: 1,
+        OBS: '',
+        "Observação": '',
+        "Posição": '',
+        Posto: '',
+        "Salário Base Mensal": '',
+        Telefone: '',
+        "Tipo Salario": ''
       };
 
-      // let created_employee = await this.$store.dispatch("postDataAsync", {
-      //   api_resourse: "employees",
-      //   post_data
-      // });
-
-      //console.log(created_employee);
-
-      this.Employees.push(created_employee);
+      this.putData(post_employee);
+      this.Employees.push(post_employee);
       console.log(this.Employees);
       this.close();
     },
