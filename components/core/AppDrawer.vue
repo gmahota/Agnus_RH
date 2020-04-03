@@ -85,16 +85,23 @@
             icon: 'mdi-account-multiple',
             text: 'Employees'
           },
-           {
-            to: '/reports/quick',
-            icon: 'mdi-file-document-outline',
-            text: 'Quick Reports'
-          },
           {
             to: '/reports/attendance',
             icon: 'mdi-clipboard-outline',
             text: 'Attendance'
           },
+           {
+            to: '/reports/quick',
+            icon: 'mdi-file-document-outline',
+            text: 'Quick Reports'
+          },
+
+          {
+            to: '/locations',
+            icon: 'mdi-file-document-outline',
+            text: 'Localizações'
+          },
+
           // {
           //   to: '/admins',
           //   icon: 'mdi-account-multiple',
