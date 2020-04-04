@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@mdi/font": "^3.6.95",
-    "@nuxtjs/firebase": "^5.0.6",
     "nuxt": "^2.12.1",
     "vue-chartist": "^2.2.0",
      "@nuxtjs/auth": "^4.8.5",
