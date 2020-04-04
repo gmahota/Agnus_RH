@@ -1,38 +1,66 @@
 <template>
   <v-container fill-height fluid grid-list-xl>
     <v-layout wrap>
-      <v-flex md3
-        sm4
-        lg4 v-for="item in Locations" :key="item.code">
-        <v-card  class="mx-auto">
+      <v-flex md12 lg12 row>
+        <text>Localizações</text>
+        <v-spacer></v-spacer>
+        <v-btn text small color="primary" @click="addLocation">+ Nova Localização</v-btn>
+      </v-flex>
+
+      <v-flex md4 sm4 lg4 v-for="item in Locations" :key="item.code">
+        <v-card class="mx-auto">
           <v-card-title>
             <v-icon>mdi-map-marker</v-icon>
             <h6>{{item.nome}}</h6>
+            <v-spacer></v-spacer>
 
-            <v-icon color="primary">more_vert</v-icon>
+            <v-menu bottom left>
+              <template v-slot:activator="{ on }">
+                <v-btn dark icon v-on="on">
+                  <v-icon color="primary">more_vert</v-icon>
+                </v-btn>
+              </template>
+
+              <v-list>
+                <v-list-item-group>
+                  <v-list-item v-for="(item, i) in items" :key="i" @click="menuAction">
+                    <v-list-item-icon>
+                      <v-icon>{{ item.icon }}</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </v-menu>
           </v-card-title>
-´
+
           <v-divider></v-divider>
+          <v-list>
+            <v-list-item-group>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>Funcionarios</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action>
+                  200
+                  <!-- <v-icon >chat_bubble</v-icon> -->
+                </v-list-item-action>
+              </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>Clock-In</v-list-item-title>
+                </v-list-item-content>
 
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title>Funcionarios</v-list-item-title>
-            </v-list-item-content>
-
-            <v-list-item-icon>
-              <v-icon :color="item.active ? 'deep-purple accent-4' : 'grey'">chat_bubble</v-icon>
-            </v-list-item-icon>
-
-            <v-divider></v-divider>
-
-            <v-list-item-content>
-              <v-list-item-title>Clock-In</v-list-item-title>
-            </v-list-item-content>
-
-            <v-list-item-icon>
-              <v-icon :color="item.active ? 'deep-purple accent-4' : 'grey'">chat_bubble</v-icon>
-            </v-list-item-icon>
-          </v-list-item>
+                <v-list-item-action>
+                  10
+                  <!-- 10 <v-icon :color="item.active ? 'deep-purple accent-4' : 'grey'">chat_bubble</v-icon> -->
+                </v-list-item-action>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
         </v-card>
       </v-flex>
     </v-layout>
@@ -45,10 +73,40 @@ import axios from "axios";
 export default {
   data: () => ({
     location: "",
-    Locations: []
+    Locations: [],
+    items: [
+      { id: 1, title: "Convidar Fúncionarios", icon: "mdi-dialpad" },
+      { id: 2, title: "Editar", icon: "mdi-pencil" },
+      { id: 3, title: "Ver Fúncionarios", icon: "mdi-account-multiple" },
+      { id: 4, title: "Relátorios", icon: "mdi-playlist-check" },
+      { id: 5, title: "Desativar", icon: "mdi-delete-forever" },
+      { id: 6, title: "Apagar", icon: "mdi-delete" }
+    ]
   }),
 
   methods: {
+    addLocation() {
+      this.$router.push(
+        `/location/create`
+      );
+      this.$forceUpdate();
+    },
+    async menuAction(item) {
+      switch (item.id) {
+        case 1:
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        case 4:
+          break;
+        case 5:
+          break;
+        case 6:
+          break;
+      }
+    },
     async getData() {
       axios
         .get("https://mahotacrm.firebaseio.com/localizacoes.json")
@@ -57,53 +115,6 @@ export default {
           console.log(this.Locations);
         })
         .catch(error => console.log(error));
-    },
-
-    detailsItem(value) {
-      this.Employees.splice(value);
-    },
-
-    editItem(value) {
-      this.employeeModel = value;
-      this.dialog = true;
-      //this.$router.push(`/inventory/products/${value.code}`);
-    },
-
-    deleteItem(value) {},
-
-    close() {
-      this.dialog = false;
-
-      //Reset form
-      // this.employeeModel = {
-      //   code: "",
-      //   name: "",
-      //   phoneNumber: "",
-      //   location: null,
-      //   status: null
-      // };
-    },
-
-    async save() {
-      let created_employee = {
-        code: this.employeeModel.code,
-        name: this.employeeModel.name,
-        email: this.employeeModel.email,
-        phoneNumber: this.employeeModel.phoneNumber,
-        location: this.employeeModel.location.code,
-        status: this.employeeModel.status.code
-      };
-
-      // let created_employee = await this.$store.dispatch("postDataAsync", {
-      //   api_resourse: "employees",
-      //   post_data
-      // });
-
-      //console.log(created_employee);
-
-      this.Employees.push(created_employee);
-      console.log(this.Employees);
-      this.close();
     },
 
     async initData() {

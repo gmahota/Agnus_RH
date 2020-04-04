@@ -1,8 +1,8 @@
 <template>
+
   <v-toolbar
     id="core-toolbar"
     flat
-    prominent
     style="background: #eee;"
   >
     <div class="v-toolbar-title">
@@ -29,13 +29,13 @@
         layout
         py-2
       >
-        <v-text-field
+        <!-- <v-text-field
           v-if="responsiveInput"
           class="mr-4 mt-2 purple-input"
           label="Search..."
           hide-details
           color="purple"
-        />
+        /> -->
         <nuxt-link
           v-ripple
           class="toolbar-items"
@@ -44,7 +44,7 @@
         >
           <v-icon color="tertiary">mdi-view-dashboard</v-icon>
         </nuxt-link>
-        <v-menu
+        <!-- <v-menu
           bottom
           left
           content-class="dropdown-menu"
@@ -79,7 +79,7 @@
               </v-list-tile>
             </v-list>
           </v-card>
-        </v-menu>
+        </v-menu> -->
         <nuxt-link
           v-ripple
           class="toolbar-items"
