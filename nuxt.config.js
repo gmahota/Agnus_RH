@@ -8,7 +8,7 @@ export default {
     "~/api/logger",
 
     // Will register file from project api directory to handle /api/* requires
-    { path: "/api", handler: "~/api/index.js" }
+    { path: "/api", handler: "~/api/index.js" },
 
     // We can create custom instances too
     //{ path: '/static2', handler: serveStatic(__dirname + '/static2') }
@@ -23,16 +23,16 @@ export default {
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { hid: "description", name: "description", content: pkg.description }
+      { hid: "description", name: "description", content: pkg.description },
     ],
     link: [
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
       {
         rel: "stylesheet",
         href:
-          "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons"
-      }
-    ]
+          "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons",
+      },
+    ],
   },
 
   /*
@@ -48,14 +48,17 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/vuetify", { src: "~/plugins/chartist", mode: "client" }],
+  plugins: ["~/plugins/vuetify",
+    { src: "~/plugins/chartist", mode: "client" },
+    { src: "~/plugins/google-maps" },
+  ],
 
   /*
    ** Nuxt.js modules
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    "@nuxtjs/axios"
+    "@nuxtjs/axios","@nuxtjs/dotenv"
   ],
   /*
    ** Axios module configuration
@@ -76,6 +79,12 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    extend(config, ctx) {
+    },
+  },
+
+  env: {
+    baseUrl: process.env.BASE_URL || 'https://localhost:5001/api',
+    VUE_APP_GOOGLE_MAPS_API_KEY: process.env.VUE_APP_GOOGLE_MAPS_API_KEY
   }
 };
