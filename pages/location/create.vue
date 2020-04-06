@@ -2,7 +2,7 @@
   <create></create>
 </template>
 <script>
-import create from "@/components/base/location/create.vue";
+import create from "@/components/base/location/Create.vue";
 
 export default {
   layout: "dashboard",

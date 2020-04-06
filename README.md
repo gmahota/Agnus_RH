@@ -1,6 +1,6 @@
 # nuxtjs-dashboard
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4b497b89-1fff-40a5-8cfe-8ad068a737c4/deploy-status)](https://app.netlify.com/sites/irh-demo/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4b497b89-1fff-40a5-8cfe-8ad068a737c4/deploy-status)](https://app.netlify.com/sites/koattendance/deploys)
 
 [![Build Status][build-status]][build-url]
 
