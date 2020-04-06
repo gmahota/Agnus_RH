@@ -1,4 +1,3 @@
-import VuetifyLoaderPlugin from "vuetify-loader/lib/plugin";
 import pkg from "./package";
 import serveStatic from "serve-static";
 
@@ -48,7 +47,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/vuetify",
+  plugins: [
     { src: "~/plugins/chartist", mode: "client" },
     { src: "~/plugins/google-maps" },
   ],
@@ -74,7 +73,6 @@ export default {
    */
   build: {
     transpile: ["vuetify/lib"],
-    plugins: [new VuetifyLoaderPlugin()],
     loaders: {},
     /*
      ** You can extend webpack config here
