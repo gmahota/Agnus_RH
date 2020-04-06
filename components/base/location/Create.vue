@@ -6,8 +6,7 @@
       <v-divider></v-divider>
 
       <v-stepper-step :complete="e1 > 2" step="2" editable>
-        Set
-        <Address></Address>
+        Set Address
       </v-stepper-step>
 
       <v-divider></v-divider>
@@ -16,16 +15,16 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step step="4" editable>Add Employees</v-stepper-step>
+      <v-stepper-step  :complete="e1 > 3" step="4" editable>Add Employees</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
       <v-stepper-content step="1">
-        <v-card class="mb-12" height="200px">
+        <v-flex>
           <v-card-text>
             <v-container>
               <v-row>
-                <h2>Hi {{fullname}} , let's set up your location.</h2>
+                <h3>Hi {{fullname}} , let's set up your location.</h3>
               </v-row>
               <v-row>
                 <v-col cols="12" sm="12" md="6">
@@ -37,7 +36,7 @@
               </v-row>
             </v-container>
           </v-card-text>
-        </v-card>
+        </v-flex>
 
         <v-btn color="primary" @click="e1 = 2">Continuar</v-btn>
 
@@ -45,10 +44,10 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <v-card class="mb-12" height="800px">
+        <v-flex>
           <v-container>
             <v-row>
-              <h2>Next, let's know where your location is.</h2>
+              <h3>Next, let's know where your location is.</h3>
               <v-col cols="12" sm="12" md="6">
                 <v-label color="primary">Your location type</v-label>
               </v-col>
@@ -93,7 +92,7 @@
               </v-flex>
             </v-row>
           </v-container>
-        </v-card>
+        </v-flex>
 
         <v-btn color="primary" @click="e1 = 3">Continue</v-btn>
 
@@ -101,9 +100,32 @@
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <v-card class="mb-12" color="grey lighten-1" height="200px"></v-card>
+        <v-container>
+          <v-flex>
+            <v-row>
+              <h3>Now, set a daily resumption and closing time for employees in this location.</h3>
+            </v-row>
+            <v-row>
+              <v-label color="primary">My employees will clock-in and out at...</v-label>
+            </v-row>
 
-        <v-btn color="primary" @click="e1 = 1">Continue</v-btn>
+            <v-row>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Clock-in time</v-label>
+                <v-time-picker v-model="location.clockIn" color="green lighten-1"></v-time-picker>
+              </v-col>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Clock-out time</v-label>
+                <v-time-picker v-model="location.clockOut" color="green lighten-1"></v-time-picker>
+              </v-col>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Grace period</v-label>
+                <v-text-field type="number" min="0" v-model="location.gracePeriod"></v-text-field>
+              </v-col>
+            </v-row>
+          </v-flex>
+        </v-container>
+        <v-btn color="primary" @click="e1 = 4">Continue</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -117,7 +139,9 @@ export default {
   data() {
     return {
       e1: 1,
-      location: {},
+      location: {
+        gracePeriod: 0
+      },
 
       currentLocation: { lat: -25.924, lng: 32.584 },
       searchAddressInput: "",
@@ -130,6 +154,11 @@ export default {
       ]
     };
   },
+  watch: {
+    currentLocation:function(){
+      this.location.position = this.currentLocation;
+    }
+  },
   methods: {
     setLocation: function(item) {
       this.markers = [];
@@ -140,6 +169,8 @@ export default {
           lng: item.latLng.lng()
         }
       };
+      this.currentLocation = position;
+
       this.markers.push(position);
     },
     geolocation: function() {
@@ -154,7 +185,7 @@ export default {
         var position = {
           position: {
             lat: position.coords.latitude,
-            lng:  position.coords.longitude
+            lng: position.coords.longitude
           }
         };
         this.markers.push(position);
