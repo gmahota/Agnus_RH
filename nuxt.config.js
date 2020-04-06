@@ -1,5 +1,6 @@
 import pkg from "./package";
 import serveStatic from "serve-static";
+require('dotenv').config();
 
 export default {
   serverMiddleware: [
@@ -57,7 +58,26 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    "@nuxtjs/axios","@nuxtjs/dotenv"
+    "@nuxtjs/axios",
+    "@nuxtjs/dotenv",
+    [
+      "@nuxtjs/firebase",
+      {
+        config: {
+          apiKey: process.env.Firebase_apiKey ,
+          authDomain: process.env.Firebase_authDomain,
+          databaseURL: process.env.Firebase_databaseURL,
+          projectId: process.env.Firebase_projectId,
+          storageBucket: process.env.Firebase_storageBucket,
+          messagingSenderId: process.env.Firebase_messagingSenderId,
+          appId: process.env.Firebase_appId,
+          measurementId: process.env.Firebase_measurementId,
+        },
+        services: {
+          auth: true, // Just as example. Can be any other service.
+        },
+      },
+    ],
   ],
   /*
    ** Axios module configuration
@@ -77,12 +97,19 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {
-    },
+    extend(config, ctx) {},
   },
 
   env: {
-    baseUrl: process.env.BASE_URL || 'https://localhost:5001/api',
-    VUE_APP_GOOGLE_MAPS_API_KEY: process.env.VUE_APP_GOOGLE_MAPS_API_KEY
-  }
+    baseUrl: process.env.BASE_URL || "https://localhost:5001/api",
+    VUE_APP_GOOGLE_MAPS_API_KEY: process.env.VUE_APP_GOOGLE_MAPS_API_KEY,
+    Firebase_apiKey: process.env.Firebase_apiKey,
+    Firebase_authDomain: process.env.Firebase_authDomain,
+    Firebase_databaseURL: process.env.Firebase_databaseURL,
+    Firebase_projectId: process.env.Firebase_projectId,
+    Firebase_storageBucket: process.env.Firebase_storageBucket,
+    Firebase_messagingSenderId: process.env.Firebase_messagingSenderId,
+    Firebase_appId: process.env.Firebase_appId,
+    Firebase_measurementId: process.env.Firebase_measurementId,
+  },
 };
