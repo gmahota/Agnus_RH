@@ -50,41 +50,44 @@
             <v-row>
               <h2>Next, let's know where your location is.</h2>
               <v-col cols="12" sm="12" md="6">
-                <v-text color="primary">Your location type</v-text>
+                <v-label color="primary">Your location type</v-label>
               </v-col>
               <v-col cols="12" sm="12" md="6">
-                <v-text color="primary">My employees will clock in and out from...</v-text>
+                <v-label color="primary">My employees will clock in and out from...</v-label>
               </v-col>
             </v-row>
             <v-row>
-              <v-radio-group v-model="location.type" row>
+              <!-- <v-radio-group v-model="location.type" row>
                 <v-radio label="A Specific address" value="address"></v-radio>
                 <v-radio label="Anywhere in a State/Province" value="state"></v-radio>
                 <v-radio label="Anywhere in a country" value="country"></v-radio>
-              </v-radio-group>
+              </v-radio-group>-->
+              <v-btn @click="geolocation" color="primary">
+                <v-icon>mdi-map-marker</v-icon>
+              </v-btn>
+              <v-text-field
+                prepend-icon="mdi-file-document-outline"
+                v-model="searchAddressInput"
+                v-on:change="searchLocation()"
+                label="Address (city,place)"
+              ></v-text-field>
             </v-row>
             <v-row>
               <v-flex md12>
-                <gmap-autocomplete class="introInput">
-                  <template v-slot:input="slotProps">
-                    <v-text-field
-                      outlined
-                      prepend-inner-icon="place"
-                      placeholder="Location Of Event"
-                      ref="input"
-                      v-on:listeners="slotProps.listeners"
-                      v-on:attrs="slotProps.attrs"
-                    ></v-text-field>
-                  </template>
-                </gmap-autocomplete>
-              </v-flex>
-              <v-flex md12>
-                <gmap-map :center="center" :map-type-id="mapTypeId" :zoom="10">
-                  <gmap-marker
-                    v-for="(item, index) in markers"
+                <gmap-map
+                  :center="{lat:currentLocation.lat, lng:currentLocation.lng}"
+                  :zoom="17"
+                  :options="{disableDefaultUI:true}"
+                  :map-type-id="mapTypeId"
+                  @click="setLocation"
+                >
+                  <GmapMarker
                     :key="index"
-                    :position="item.position"
-                    @click="center = item.position"
+                    v-for="(m, index) in markers"
+                    :position="m.position"
+                    :clickable="true"
+                    :draggable="true"
+                    @click="center=m.position"
                   />
                 </gmap-map>
               </v-flex>
@@ -116,6 +119,9 @@ export default {
       e1: 1,
       location: {},
 
+      currentLocation: { lat: -25.924, lng: 32.584 },
+      searchAddressInput: "",
+
       center: { lat: -25.924, lng: 32.584 },
       mapTypeId: "terrain",
       markers: [
@@ -124,15 +130,59 @@ export default {
       ]
     };
   },
+  methods: {
+    setLocation: function(item) {
+      this.markers = [];
+
+      var position = {
+        position: {
+          lat: item.latLng.lat(),
+          lng: item.latLng.lng()
+        }
+      };
+      this.markers.push(position);
+    },
+    geolocation: function() {
+      navigator.geolocation.getCurrentPosition(position => {
+        this.currentLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        this.markers = [];
+
+        var position = {
+          position: {
+            lat: position.coords.latitude,
+            lng:  position.coords.longitude
+          }
+        };
+        this.markers.push(position);
+      });
+    },
+    searchLocation: function() {
+      var geocoder = new google.maps.Geocoder();
+      geocoder.geocode(
+        { address: this.searchAddressInput },
+        (results, status) => {
+          if (status === "OK") {
+            this.currentLocation.lat = results[0].geometry.location.lat();
+            this.currentLocation.lng = results[0].geometry.location.lng();
+          }
+        }
+      );
+    }
+  },
+  mounted: function() {
+    this.geolocation();
+  },
   computed: {
     ...mapGetters({
       user: "user/getUser",
       fullname: "user/getFullname"
     })
   },
-  created() {
-    console.log(process.env.VUE_APP_GOOGLE_MAPS_API_KEY);
-  }
+  created() {}
 };
 </script>
 
