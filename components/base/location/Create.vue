@@ -5,9 +5,7 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step :complete="e1 > 2" step="2" editable>
-        Set Address
-      </v-stepper-step>
+      <v-stepper-step :complete="e1 > 2" step="2" editable>Set Address</v-stepper-step>
 
       <v-divider></v-divider>
 
@@ -15,7 +13,7 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step  :complete="e1 > 3" step="4" editable>Add Employees</v-stepper-step>
+      <v-stepper-step :complete="e1 > 4" step="4" editable>Add Employees</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
@@ -38,7 +36,7 @@
           </v-card-text>
         </v-flex>
 
-        <v-btn color="primary" @click="e1 = 2">Continuar</v-btn>
+        <v-btn color="primary" @click="saveLocation" :loading="processing">Continuar</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -129,11 +127,132 @@
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
+
+      <v-stepper-content step="4">
+        <v-container>
+          <v-flex>
+            <v-row>
+              <h3>You did it!</h3>
+            </v-row>
+            <v-row>
+              <v-label color="primary">
+                Now let's Add Employees to clock in and out of this location
+                <v-btn @click="dialog = !dialog">
+                  <v-icon color="primary">mdi-plus-circle</v-icon>
+                </v-btn>
+              </v-label>
+            </v-row>
+
+            <v-row>
+              <v-data-table
+                :headers="headers"
+                :items="Employees"
+                single-select
+                :items-per-page="25"
+                item-key="code"
+                class="elevation-0"
+                :loading="loading"
+                loading-text="Loading products. Please wait"
+              >
+                <template slot="headerCell" slot-scope="{ header }">
+                  <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+                </template>
+                <template slot="items" slot-scope="{ item }">
+                  <td>{{ item.code }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.email }}</td>
+                  <td>{{ item.phoneNumber }}</td>
+                  <td>{{ item.jobTitle }}</td>
+                  <td>{{ item.notes }}</td>
+                  <td>{{ item.status }}</td>
+                  <td >
+                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+                    <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+                  </td>
+                </template>
+
+                <template v-slot:item.action>
+                  <v-icon
+                   @click="deleteItem"
+                    small
+                    color="error"
+                  >mdi-delete</v-icon>
+                </template>
+              </v-data-table>
+
+              <v-divider></v-divider>
+            </v-row>
+          </v-flex>
+
+          <v-dialog v-model="dialog">
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+              </v-card-title>
+
+              <v-card-text>
+                <v-flex column>
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.code" label="Code"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.name" label="Name"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row></v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.email" label="Email"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
+                    </v-col>
+                  </v-row>
+
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.jobTitle" label="Job Title"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-select
+                        v-model="employeeModel.status"
+                        :items="Status"
+                        clearable
+                        label="Status"
+
+                        data-vv-name="employeeModel.status"
+
+                        item-text="description"
+                        item-value="code"
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+
+                  <v-row>
+                    <v-textarea clearable v-model="employeeModel.notes" label="Notes"></v-textarea>
+                  </v-row>
+                </v-flex>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Gravar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-container>
+        <v-btn color="primary" @click="e1 = 4">Finish location setup</v-btn>
+
+        <v-btn text>Cancel</v-btn>
+      </v-stepper-content>
     </v-stepper-items>
   </v-stepper>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import axios from "axios";
 
 export default {
   data() {
@@ -148,14 +267,42 @@ export default {
 
       center: { lat: -25.924, lng: 32.584 },
       mapTypeId: "terrain",
-      markers: [
-        // { position: { lat: -0.48585, lng: 117.1466 } },
-        // { position: { lat: -6.9127778, lng: 107.6205556 } }
+      markers: [],
+      processing: false,
+
+      dialog: false,
+      formTitle: "Employees Data",
+      loading: false,
+      Employees: [],
+      employeeModel: {
+        code: "",
+        name: "",
+        email: "",
+        phoneNumber: "",
+        jobTitle: "",
+        notes: "",
+        location: null,
+        status: null
+      },
+      headers: [
+        { text: "Code", value: "code" },
+        { text: "Name", value: "name" },
+        { text: "Email", value: "email" },
+        { text: "Phone Number", value: "phoneNumber" },
+        { text: "Job Tilte", value: "jobTitle" },
+        { text: "Notes ", value: "notes" },
+        { text: "Status ", value: "status" },
+        { text: "Actions", value: "action", sortable: false }
+      ],
+      Status: [
+        { code: "Active", description: "Active" },
+        { code: "Deactived", description: "Deactived" },
+        { code: "Inveted", description: "Inveted" }
       ]
     };
   },
   watch: {
-    currentLocation:function(){
+    currentLocation: function() {
       this.location.position = this.currentLocation;
     }
   },
@@ -202,6 +349,51 @@ export default {
           }
         }
       );
+    },
+
+    deleteItem(value) {
+      this.Employees.splice(value);
+    },
+
+    editItem(value) {
+      console.log(value)
+      this.employeeModel = value;
+      this.dialog = true;
+    },
+
+    close() {
+      this.dialog = false;
+      this.employeeModel = {
+        code: "",
+        name: "",
+        email: "",
+        phoneNumber: "",
+        jobTitle: "",
+        notes: "",
+        location: null,
+        status: null
+      };
+    },
+
+    async save() {
+      this.Employees.push(this.employeeModel);
+
+      this.close();
+    },
+
+    async saveLocation(){
+
+      this.processing = true;
+
+      await axios
+        .put(`https://mahotacrm.firebaseio.com/Location/${this.Employees.length}.json`, data)
+        .then(response => {
+          console.log('The newrly created data is: ', response);
+        })
+        .catch(error => console.log(error));
+
+      this.processing = false;
+      e1 = 2;
     }
   },
   mounted: function() {
