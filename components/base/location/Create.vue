@@ -92,7 +92,7 @@
           </v-container>
         </v-flex>
 
-        <v-btn color="primary" @click="e1 = 3">Continue</v-btn>
+        <v-btn color="primary" @click="updateLocation(3)">Continue</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -123,7 +123,7 @@
             </v-row>
           </v-flex>
         </v-container>
-        <v-btn color="primary" @click="e1 = 4">Continue</v-btn>
+        <v-btn color="primary" @click="updateLocation(4)">Continue</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -237,7 +237,7 @@
             </v-card>
           </v-dialog>
         </v-container>
-        <v-btn color="primary" @click="e1 = 4">Finish location setup</v-btn>
+        <v-btn color="primary" @click="finishSetup">Finish location setup</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -253,9 +253,10 @@ export default {
     return {
       e1: 1,
       location: {
-        gracePeriod: 0
+        gracePeriod: 0,
+        name: ""
       },
-
+      locationKey: "",
       currentLocation: { lat: -25.924, lng: 32.584 },
       searchAddressInput: "",
 
@@ -297,6 +298,7 @@ export default {
   },
   watch: {
     currentLocation: function() {
+      console.log(this.currentLocation);
       this.location.position = this.currentLocation;
     }
   },
@@ -310,7 +312,7 @@ export default {
           lng: item.latLng.lng()
         }
       };
-      this.currentLocation = position;
+      this.currentLocation = position.position;
 
       this.markers.push(position);
     },
@@ -378,21 +380,58 @@ export default {
     async saveLocation() {
       this.processing = true;
 
-      const locationRef = this.$fireDb.ref("location");
-      try {
-        console.log(this.location);
+      if (this.location.name === "") {
+        this.processing = false;
+        alert("The location name is mandatory!");
 
-        await locationRef.set({
-          location: this.location
-        });
-      } catch (e) {
-        alert(e);
         return;
       }
-      alert("Success.");
+
+      try {
+        const locationRef = this.$fireDb.ref("location");
+
+        var newChildRef = locationRef.push();
+        this.locationKey = newChildRef.key;
+
+        await newChildRef.set(this.location);
+        this.e1 = 2;
+      } catch (e) {
+        console.log(e);
+
+        alert(
+          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+        );
+      }
 
       this.processing = false;
-      this.e1 = 2;
+    },
+    async updateLocation(e1) {
+      this.processing = true;
+
+      try {
+        const locationRef = this.$fireDb
+          .ref("location")
+          .child(this.locationKey);
+
+        await locationRef.update(this.location);
+        this.e1 = e1;
+      } catch (e) {
+        console.log(e);
+        alert(
+          "Ocorreu um erro durante a actualização da localização. Contacte os Administradores do Sistema!!"
+        );
+      }
+
+      this.processing = false;
+    },
+
+    async finishSetup() {
+      console.log
+      var url = `/locations`;
+
+      this.$router.push(url);
+
+
     }
   },
   mounted: function() {
