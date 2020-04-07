@@ -4,6 +4,7 @@
     id="core-toolbar"
     flat
     style="background: #eee;"
+    height="50px"
   >
     <div class="v-toolbar-title">
       <v-toolbar-title
