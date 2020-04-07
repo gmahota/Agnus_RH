@@ -1,6 +1,6 @@
 import pkg from "./package";
 import serveStatic from "serve-static";
-require('dotenv').config();
+require("dotenv").config();
 
 export default {
   serverMiddleware: [
@@ -64,7 +64,7 @@ export default {
       "@nuxtjs/firebase",
       {
         config: {
-          apiKey: process.env.Firebase_apiKey ,
+          apiKey: process.env.Firebase_apiKey,
           authDomain: process.env.Firebase_authDomain,
           databaseURL: process.env.Firebase_databaseURL,
           projectId: process.env.Firebase_projectId,
@@ -75,6 +75,8 @@ export default {
         },
         services: {
           auth: true, // Just as example. Can be any other service.
+          realtimeDb: true,
+          messaging: true,
         },
       },
     ],

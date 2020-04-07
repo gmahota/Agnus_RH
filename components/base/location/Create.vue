@@ -165,18 +165,14 @@
                   <td>{{ item.jobTitle }}</td>
                   <td>{{ item.notes }}</td>
                   <td>{{ item.status }}</td>
-                  <td >
+                  <td>
                     <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
                     <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
                   </td>
                 </template>
 
                 <template v-slot:item.action>
-                  <v-icon
-                   @click="deleteItem"
-                    small
-                    color="error"
-                  >mdi-delete</v-icon>
+                  <v-icon @click="deleteItem" small color="error">mdi-delete</v-icon>
                 </template>
               </v-data-table>
 
@@ -220,9 +216,7 @@
                         :items="Status"
                         clearable
                         label="Status"
-
                         data-vv-name="employeeModel.status"
-
                         item-text="description"
                         item-value="code"
                       ></v-select>
@@ -356,7 +350,7 @@ export default {
     },
 
     editItem(value) {
-      console.log(value)
+      console.log(value);
       this.employeeModel = value;
       this.dialog = true;
     },
@@ -381,19 +375,24 @@ export default {
       this.close();
     },
 
-    async saveLocation(){
-
+    async saveLocation() {
       this.processing = true;
 
-      await axios
-        .put(`https://mahotacrm.firebaseio.com/Location/${this.Employees.length}.json`, data)
-        .then(response => {
-          console.log('The newrly created data is: ', response);
-        })
-        .catch(error => console.log(error));
+      const locationRef = this.$fireDb.ref("location");
+      try {
+        console.log(this.location);
+
+        await locationRef.set({
+          location: this.location
+        });
+      } catch (e) {
+        alert(e);
+        return;
+      }
+      alert("Success.");
 
       this.processing = false;
-      e1 = 2;
+      this.e1 = 2;
     }
   },
   mounted: function() {

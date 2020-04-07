@@ -68,6 +68,7 @@ Vuetify is developed exactly according to Material Design spec. Every component 
 - [Vuetify](https://vuetifyjs.com/en/) for the beautiful vue framework UI
 - [Vuetify Material Theme](https://www.creative-tim.com/product/vuetify-material-dashboard?ref=vuetifyjs.com) for the beautiful work realized by [Creative Tim](https://www.creative-tim.com/)
 - [Nuxt Google Maps](https://github.com/xkjyeah/vue-google-maps#readme) for Google Maps Integration
+- [Firebase Nuxt](https://github.com/nuxt-community/firebase-module) for Firebase Database
 
 Por ver: 
 "firebase": "^7.9.3",
