@@ -298,7 +298,6 @@ export default {
   },
   watch: {
     currentLocation: function() {
-      console.log(this.currentLocation);
       this.location.position = this.currentLocation;
     }
   },
@@ -380,10 +379,12 @@ export default {
     async saveLocation() {
       this.processing = true;
 
-      if (this.location.name === "") {
-        this.processing = false;
-        alert("The location name is mandatory!");
 
+      //Validation
+      if (this.location.name === "") {
+
+        alert("The location name is mandatory!");
+        this.processing = false;
         return;
       }
 
@@ -430,8 +431,6 @@ export default {
       var url = `/locations`;
 
       this.$router.push(url);
-
-
     }
   },
   mounted: function() {

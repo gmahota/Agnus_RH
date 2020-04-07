@@ -6,12 +6,12 @@
         <v-spacer></v-spacer>
         <v-btn text small color="primary" @click="addLocation">+ Nova Localização</v-btn>
       </v-flex>
-
-      <v-flex md4 sm4 lg4 v-for="item in Locations" :key="item.code">
+ <v-spacer></v-spacer>
+      <v-flex md4 sm4 lg4 v-for="item in Locations" :key="item.name">
         <v-card class="mx-auto">
           <v-card-title>
             <v-icon>mdi-map-marker</v-icon>
-            <h6>{{item.nome}}</h6>
+            <h6>{{item.name}}</h6>
             <v-spacer></v-spacer>
 
             <v-menu bottom left>
@@ -83,12 +83,39 @@ export default {
       { id: 6, title: "Apagar", icon: "mdi-delete" }
     ]
   }),
+  mounted(){
+    try {
+        this.Locations = [];
+
+        let self = this;
+
+        this.$fireDb.ref("location").once("value", function(snapshot) {
+          let returnArr = [];
+          snapshot.forEach(function(childSnapshot) {
+            try {
+              var childKey = childSnapshot.key;
+              var childData = childSnapshot.val();
+              returnArr.push(childSnapshot.val());
+
+
+              self.Locations= returnArr;
+            } catch (e) {
+              console.log(e);
+            }
+          });
+        });
+      } catch (e) {
+        console.log(e);
+
+        alert(
+          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+        );
+      }
+  },
 
   methods: {
     addLocation() {
-      this.$router.push(
-        `/location/create`
-      );
+      this.$router.push(`/location/create`);
       this.$forceUpdate();
     },
     async menuAction(item) {
@@ -107,14 +134,21 @@ export default {
           break;
       }
     },
+
+    async insertLocation(item){
+
+    },
+
     async getData() {
-      axios
-        .get("https://mahotacrm.firebaseio.com/localizacoes.json")
-        .then(response => {
-          this.Locations = response.data;
-          console.log(this.Locations);
-        })
-        .catch(error => console.log(error));
+
+
+      // axios
+      //   .get("https://mahotacrm.firebaseio.com/location.json")
+      //   .then(response => {
+      //     this.Locations = response.data;
+      //     console.log(this.Locations);
+      //   })
+      //   .catch(error => console.log(error));
     },
 
     async initData() {
