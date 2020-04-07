@@ -5,10 +5,7 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step :complete="e1 > 2" step="2" editable>
-        Set
-        <Address></Address>
-      </v-stepper-step>
+      <v-stepper-step :complete="e1 > 2" step="2" editable>Set Address</v-stepper-step>
 
       <v-divider></v-divider>
 
@@ -16,16 +13,16 @@
 
       <v-divider></v-divider>
 
-      <v-stepper-step step="4" editable>Add Employees</v-stepper-step>
+      <v-stepper-step :complete="e1 > 4" step="4" editable>Add Employees</v-stepper-step>
     </v-stepper-header>
 
     <v-stepper-items>
       <v-stepper-content step="1">
-        <v-card class="mb-12" height="200px">
+        <v-flex>
           <v-card-text>
             <v-container>
               <v-row>
-                <h2>Hi {{fullname}} , let's set up your location.</h2>
+                <h3>Hi {{fullname}} , let's set up your location.</h3>
               </v-row>
               <v-row>
                 <v-col cols="12" sm="12" md="6">
@@ -37,60 +34,63 @@
               </v-row>
             </v-container>
           </v-card-text>
-        </v-card>
+        </v-flex>
 
-        <v-btn color="primary" @click="e1 = 2">Continuar</v-btn>
+        <v-btn color="primary" @click="saveLocation" :loading="processing">Continuar</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <v-card class="mb-12" height="800px">
+        <v-flex>
           <v-container>
             <v-row>
-              <h2>Next, let's know where your location is.</h2>
+              <h3>Next, let's know where your location is.</h3>
               <v-col cols="12" sm="12" md="6">
-                <v-text color="primary">Your location type</v-text>
+                <v-label color="primary">Your location type</v-label>
               </v-col>
               <v-col cols="12" sm="12" md="6">
-                <v-text color="primary">My employees will clock in and out from...</v-text>
+                <v-label color="primary">My employees will clock in and out from...</v-label>
               </v-col>
             </v-row>
             <v-row>
-              <v-radio-group v-model="location.type" row>
+              <!-- <v-radio-group v-model="location.type" row>
                 <v-radio label="A Specific address" value="address"></v-radio>
                 <v-radio label="Anywhere in a State/Province" value="state"></v-radio>
                 <v-radio label="Anywhere in a country" value="country"></v-radio>
-              </v-radio-group>
+              </v-radio-group>-->
+              <v-btn @click="geolocation" color="primary">
+                <v-icon>mdi-map-marker</v-icon>
+              </v-btn>
+              <v-text-field
+                prepend-icon="mdi-file-document-outline"
+                v-model="searchAddressInput"
+                v-on:change="searchLocation()"
+                label="Address (city,place)"
+              ></v-text-field>
             </v-row>
             <v-row>
               <v-flex md12>
-                <gmap-autocomplete class="introInput">
-                  <template v-slot:input="slotProps">
-                    <v-text-field
-                      outlined
-                      prepend-inner-icon="place"
-                      placeholder="Location Of Event"
-                      ref="input"
-                      v-on:listeners="slotProps.listeners"
-                      v-on:attrs="slotProps.attrs"
-                    ></v-text-field>
-                  </template>
-                </gmap-autocomplete>
-              </v-flex>
-              <v-flex md12>
-                <gmap-map :center="center" :map-type-id="mapTypeId" :zoom="10">
-                  <gmap-marker
-                    v-for="(item, index) in markers"
+                <gmap-map
+                  :center="{lat:currentLocation.lat, lng:currentLocation.lng}"
+                  :zoom="17"
+                  :options="{disableDefaultUI:true}"
+                  :map-type-id="mapTypeId"
+                  @click="setLocation"
+                >
+                  <GmapMarker
                     :key="index"
-                    :position="item.position"
-                    @click="center = item.position"
+                    v-for="(m, index) in markers"
+                    :position="m.position"
+                    :clickable="true"
+                    :draggable="true"
+                    @click="center=m.position"
                   />
                 </gmap-map>
               </v-flex>
             </v-row>
           </v-container>
-        </v-card>
+        </v-flex>
 
         <v-btn color="primary" @click="e1 = 3">Continue</v-btn>
 
@@ -98,9 +98,146 @@
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <v-card class="mb-12" color="grey lighten-1" height="200px"></v-card>
+        <v-container>
+          <v-flex>
+            <v-row>
+              <h3>Now, set a daily resumption and closing time for employees in this location.</h3>
+            </v-row>
+            <v-row>
+              <v-label color="primary">My employees will clock-in and out at...</v-label>
+            </v-row>
 
-        <v-btn color="primary" @click="e1 = 1">Continue</v-btn>
+            <v-row>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Clock-in time</v-label>
+                <v-time-picker v-model="location.clockIn" color="green lighten-1"></v-time-picker>
+              </v-col>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Clock-out time</v-label>
+                <v-time-picker v-model="location.clockOut" color="green lighten-1"></v-time-picker>
+              </v-col>
+              <v-col md4 sm4 lg3>
+                <v-label color="primary">Grace period</v-label>
+                <v-text-field type="number" min="0" v-model="location.gracePeriod"></v-text-field>
+              </v-col>
+            </v-row>
+          </v-flex>
+        </v-container>
+        <v-btn color="primary" @click="e1 = 4">Continue</v-btn>
+
+        <v-btn text>Cancel</v-btn>
+      </v-stepper-content>
+
+      <v-stepper-content step="4">
+        <v-container>
+          <v-flex>
+            <v-row>
+              <h3>You did it!</h3>
+            </v-row>
+            <v-row>
+              <v-label color="primary">
+                Now let's Add Employees to clock in and out of this location
+                <v-btn @click="dialog = !dialog">
+                  <v-icon color="primary">mdi-plus-circle</v-icon>
+                </v-btn>
+              </v-label>
+            </v-row>
+
+            <v-row>
+              <v-data-table
+                :headers="headers"
+                :items="Employees"
+                single-select
+                :items-per-page="25"
+                item-key="code"
+                class="elevation-0"
+                :loading="loading"
+                loading-text="Loading products. Please wait"
+              >
+                <template slot="headerCell" slot-scope="{ header }">
+                  <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
+                </template>
+                <template slot="items" slot-scope="{ item }">
+                  <td>{{ item.code }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.email }}</td>
+                  <td>{{ item.phoneNumber }}</td>
+                  <td>{{ item.jobTitle }}</td>
+                  <td>{{ item.notes }}</td>
+                  <td>{{ item.status }}</td>
+                  <td>
+                    <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+                    <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+                  </td>
+                </template>
+
+                <template v-slot:item.action>
+                  <v-icon @click="deleteItem" small color="error">mdi-delete</v-icon>
+                </template>
+              </v-data-table>
+
+              <v-divider></v-divider>
+            </v-row>
+          </v-flex>
+
+          <v-dialog v-model="dialog">
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+              </v-card-title>
+
+              <v-card-text>
+                <v-flex column>
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.code" label="Code"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.name" label="Name"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row></v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.email" label="Email"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
+                    </v-col>
+                  </v-row>
+
+                  <v-row>
+                    <v-col>
+                      <v-text-field v-model="employeeModel.jobTitle" label="Job Title"></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-select
+                        v-model="employeeModel.status"
+                        :items="Status"
+                        clearable
+                        label="Status"
+                        data-vv-name="employeeModel.status"
+                        item-text="description"
+                        item-value="code"
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+
+                  <v-row>
+                    <v-textarea clearable v-model="employeeModel.notes" label="Notes"></v-textarea>
+                  </v-row>
+                </v-flex>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Gravar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-container>
+        <v-btn color="primary" @click="e1 = 4">Finish location setup</v-btn>
 
         <v-btn text>Cancel</v-btn>
       </v-stepper-content>
@@ -109,20 +246,157 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import axios from "axios";
 
 export default {
   data() {
     return {
       e1: 1,
-      location: {},
+      location: {
+        gracePeriod: 0
+      },
+
+      currentLocation: { lat: -25.924, lng: 32.584 },
+      searchAddressInput: "",
 
       center: { lat: -25.924, lng: 32.584 },
       mapTypeId: "terrain",
-      markers: [
-        // { position: { lat: -0.48585, lng: 117.1466 } },
-        // { position: { lat: -6.9127778, lng: 107.6205556 } }
+      markers: [],
+      processing: false,
+
+      dialog: false,
+      formTitle: "Employees Data",
+      loading: false,
+      Employees: [],
+      employeeModel: {
+        code: "",
+        name: "",
+        email: "",
+        phoneNumber: "",
+        jobTitle: "",
+        notes: "",
+        location: null,
+        status: null
+      },
+      headers: [
+        { text: "Code", value: "code" },
+        { text: "Name", value: "name" },
+        { text: "Email", value: "email" },
+        { text: "Phone Number", value: "phoneNumber" },
+        { text: "Job Tilte", value: "jobTitle" },
+        { text: "Notes ", value: "notes" },
+        { text: "Status ", value: "status" },
+        { text: "Actions", value: "action", sortable: false }
+      ],
+      Status: [
+        { code: "Active", description: "Active" },
+        { code: "Deactived", description: "Deactived" },
+        { code: "Inveted", description: "Inveted" }
       ]
     };
+  },
+  watch: {
+    currentLocation: function() {
+      this.location.position = this.currentLocation;
+    }
+  },
+  methods: {
+    setLocation: function(item) {
+      this.markers = [];
+
+      var position = {
+        position: {
+          lat: item.latLng.lat(),
+          lng: item.latLng.lng()
+        }
+      };
+      this.currentLocation = position;
+
+      this.markers.push(position);
+    },
+    geolocation: function() {
+      navigator.geolocation.getCurrentPosition(position => {
+        this.currentLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        this.markers = [];
+
+        var position = {
+          position: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+        };
+        this.markers.push(position);
+      });
+    },
+    searchLocation: function() {
+      var geocoder = new google.maps.Geocoder();
+      geocoder.geocode(
+        { address: this.searchAddressInput },
+        (results, status) => {
+          if (status === "OK") {
+            this.currentLocation.lat = results[0].geometry.location.lat();
+            this.currentLocation.lng = results[0].geometry.location.lng();
+          }
+        }
+      );
+    },
+
+    deleteItem(value) {
+      this.Employees.splice(value);
+    },
+
+    editItem(value) {
+      console.log(value);
+      this.employeeModel = value;
+      this.dialog = true;
+    },
+
+    close() {
+      this.dialog = false;
+      this.employeeModel = {
+        code: "",
+        name: "",
+        email: "",
+        phoneNumber: "",
+        jobTitle: "",
+        notes: "",
+        location: null,
+        status: null
+      };
+    },
+
+    async save() {
+      this.Employees.push(this.employeeModel);
+
+      this.close();
+    },
+
+    async saveLocation() {
+      this.processing = true;
+
+      const locationRef = this.$fireDb.ref("location");
+      try {
+        console.log(this.location);
+
+        await locationRef.set({
+          location: this.location
+        });
+      } catch (e) {
+        alert(e);
+        return;
+      }
+      alert("Success.");
+
+      this.processing = false;
+      this.e1 = 2;
+    }
+  },
+  mounted: function() {
+    this.geolocation();
   },
   computed: {
     ...mapGetters({
@@ -130,9 +404,7 @@ export default {
       fullname: "user/getFullname"
     })
   },
-  created() {
-    console.log(process.env.VUE_APP_GOOGLE_MAPS_API_KEY);
-  }
+  created() {}
 };
 </script>
 

@@ -1,6 +1,6 @@
 # nuxtjs-dashboard
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4b497b89-1fff-40a5-8cfe-8ad068a737c4/deploy-status)](https://app.netlify.com/sites/irh-demo/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4b497b89-1fff-40a5-8cfe-8ad068a737c4/deploy-status)](https://app.netlify.com/sites/koattendance/deploys)
 
 [![Build Status][build-status]][build-url]
 
@@ -67,7 +67,8 @@ Vuetify is developed exactly according to Material Design spec. Every component 
 - [NuxtJs](https://nuxtjs.org/) for the wonderful vue framework <3
 - [Vuetify](https://vuetifyjs.com/en/) for the beautiful vue framework UI
 - [Vuetify Material Theme](https://www.creative-tim.com/product/vuetify-material-dashboard?ref=vuetifyjs.com) for the beautiful work realized by [Creative Tim](https://www.creative-tim.com/)
-- [Nuxt Google Maps](https://github.com/xkjyeah/vue-google-maps) for Google Maps Integration
+- [Nuxt Google Maps](https://github.com/xkjyeah/vue-google-maps#readme) for Google Maps Integration
+- [Firebase Nuxt](https://github.com/nuxt-community/firebase-module) for Firebase Database
 
 Por ver: 
 "firebase": "^7.9.3",
