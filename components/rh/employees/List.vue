@@ -51,23 +51,8 @@ export default {
 
   methods: {
     initialize(endpoint) {
-        axios.post('http://localhost:3000/api/test', { data: 'Authenticated'})
-        .then()
-
-       /*
-        axios
-          .get(`${this.firbase_db_url}${endpoint}.json`)
-          .then(response => {
-            
-            console.log(`${this.firbase_db_url}${endpoint}.json`)
-            console.log(response)
-            
-            for (const key in response.data) {
-              this.employees.push({ ...response.data[key] , db_id: key})
-            }
-          })
-          .catch(error => console.log(error));
-        */
+      //axios.post('http://localhost:3000/api/test', { data: 'Authenticated'})
+      //.then()
     },
 
     editItem(item) {
