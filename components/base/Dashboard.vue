@@ -6,12 +6,12 @@
         <v-spacer></v-spacer>
         <v-btn text small color="primary" @click="addLocation">+ Nova Localização</v-btn>
       </v-flex>
- <v-spacer></v-spacer>
-      <v-flex md4 sm4 lg4 v-for="item in Locations" :key="item.name">
+      <v-spacer></v-spacer>
+      <v-flex md4 sm4 lg4 v-for="loc in Locations" :key="loc.code">
         <v-card class="mx-auto">
           <v-card-title>
             <v-icon>mdi-map-marker</v-icon>
-            <h6>{{item.name}}</h6>
+            <h6>{{loc.location.name}}</h6>
             <v-spacer></v-spacer>
 
             <v-menu bottom left>
@@ -44,7 +44,7 @@
                   <v-list-item-title>Funcionarios</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                  200
+                  {{loc.employees}}
                   <!-- <v-icon >chat_bubble</v-icon> -->
                 </v-list-item-action>
               </v-list-item>
@@ -55,7 +55,7 @@
                 </v-list-item-content>
 
                 <v-list-item-action>
-                  10
+                  {{loc.clockIn}}
                   <!-- 10 <v-icon :color="item.active ? 'deep-purple accent-4' : 'grey'">chat_bubble</v-icon> -->
                 </v-list-item-action>
               </v-list-item>
@@ -83,34 +83,49 @@ export default {
       { id: 6, title: "Apagar", icon: "mdi-delete" }
     ]
   }),
-  mounted(){
+  async beforeMount() {
     try {
-        this.Locations = [];
+      this.Locations = [];
 
-        let self = this;
+      let self = this;
 
-        this.$fireDb.ref("location").once("value", function(snapshot) {
-          let returnArr = [];
-          snapshot.forEach(function(childSnapshot) {
-            try {
-              var childKey = childSnapshot.key;
-              var childData = childSnapshot.val();
-              returnArr.push(childSnapshot.val());
+      await this.$fireDb.ref("location").once("value", function(snapshot) {
+        let returnArr = [];
+        snapshot.forEach(function(childSnapshot) {
+          try {
+            var childKey = childSnapshot.key;
+            var childData = childSnapshot.val();
 
+            var item = {
+              code: childKey,
+              employees: 0,
+              clockIn: 0,
+              location: childData
+            };
 
-              self.Locations= returnArr;
-            } catch (e) {
-              console.log(e);
-            }
-          });
+            returnArr.push(item);
+
+            self.Locations = returnArr;
+          } catch (e) {
+            console.log(e);
+          }
         });
-      } catch (e) {
-        console.log(e);
+      });
 
-        alert(
-          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
-        );
+      for (var i = 0; i < this.Locations.length; i++) {
+        var item = this.Locations[i];
+        await self.getCount(item.code).then(resolve => {
+          this.Locations[i].employees = resolve;
+        });
       }
+
+    } catch (e) {
+      console.log(e);
+
+      alert(
+        "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+      );
+    }
   },
 
   methods: {
@@ -135,13 +150,26 @@ export default {
       }
     },
 
-    async insertLocation(item){
+    async getCount(locationId) {
+      let count = 0;
 
+      var ref = this.$fireDb.ref("employee");
+
+      var a = await ref
+        .orderByChild("location")
+        .equalTo(locationId)
+        .once("value", function(snapshot) {
+          snapshot.forEach(function(childSnapshot) {
+            count++;
+          });
+        });
+
+
+
+      return count;
     },
 
     async getData() {
-
-
       // axios
       //   .get("https://mahotacrm.firebaseio.com/location.json")
       //   .then(response => {

@@ -232,7 +232,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">Cancelar</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Gravar</v-btn>
+                <v-btn color="blue darken-1" text @click="saveEmployee">Gravar</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -370,10 +370,29 @@ export default {
       };
     },
 
-    async save() {
-      this.Employees.push(this.employeeModel);
+    async saveEmployee() {
 
-      this.close();
+
+      try {
+
+        const dataRef = this.$fireDb.ref("employee");
+
+        var newChildRef = dataRef.push();
+
+        await newChildRef.set(this.employeeModel);
+
+        this.Employees.push(this.employeeModel);
+        this.close();
+
+      } catch (e) {
+        console.log(e);
+
+        alert(
+          "Ocorreu um erro durante a gravação da Fúncionario. Contacte os Administradores do Sistema!!"
+        );
+      }
+
+
     },
 
     async saveLocation() {
@@ -392,7 +411,9 @@ export default {
         const locationRef = this.$fireDb.ref("location");
 
         var newChildRef = locationRef.push();
+
         this.locationKey = newChildRef.key;
+        this.employeeModel.location = this.locationKey;
 
         await newChildRef.set(this.location);
         this.e1 = 2;
