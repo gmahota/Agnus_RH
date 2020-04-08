@@ -23,7 +23,7 @@
 
               <v-list>
                 <v-list-item-group>
-                  <v-list-item v-for="(item, i) in items" :key="i" @click="menuAction">
+                  <v-list-item v-for="(item, i) in items" :key="i" @click="menuAction(item,loc)">
                     <v-list-item-icon>
                       <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-icon>
@@ -133,15 +133,19 @@ export default {
       this.$router.push(`/location/create`);
       this.$forceUpdate();
     },
-    async menuAction(item) {
+    async menuAction(item,loc) {
       switch (item.id) {
         case 1:
+          this.$router.push(`/location/employees?location=`+loc.code);
+          this.$forceUpdate();
           break;
         case 2:
           break;
         case 3:
           break;
         case 4:
+          this.$router.push(`/location/employees?location=`+loc.code);
+          this.$forceUpdate();
           break;
         case 5:
           break;
@@ -170,13 +174,7 @@ export default {
     },
 
     async getData() {
-      // axios
-      //   .get("https://mahotacrm.firebaseio.com/location.json")
-      //   .then(response => {
-      //     this.Locations = response.data;
-      //     console.log(this.Locations);
-      //   })
-      //   .catch(error => console.log(error));
+
     },
 
     async initData() {
