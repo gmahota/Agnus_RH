@@ -61,21 +61,21 @@ export default {
           icon: "mdi-view-dashboard",
           text: "Dashboard"
         },
-        {
-          to: "/employees",
-          icon: "mdi-account-multiple",
-          text: "Employees"
-        },
+        // {
+        //   to: "/employees",
+        //   icon: "mdi-account-multiple",
+        //   text: "Employees"
+        // },
         {
           to: "/reports/attendance",
           icon: "mdi-clipboard-outline",
           text: "Attendance"
         },
-        {
-          to: "/reports/quick",
-          icon: "mdi-file-document-outline",
-          text: "Quick Reports"
-        },
+        // {
+        //   to: "/reports/quick",
+        //   icon: "mdi-file-document-outline",
+        //   text: "Quick Reports"
+        // },
 
         {
           to: "/locations",
