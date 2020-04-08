@@ -51,7 +51,7 @@
             </v-col>
             <v-col>
               <label>
-                Delay
+                Late
                 <v-icon small color="yellow">mdi-checkbox-blank-circle</v-icon>
               </label>
             </v-col>
@@ -331,7 +331,7 @@ export default {
         if (hourDiff < 0 && hourDiff * -1 > 8) {
           return "Missed";
         } else {
-          return "Delay";
+          return "Late";
         }
       }
 
