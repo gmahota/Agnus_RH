@@ -86,7 +86,7 @@ export default {
     // See https://github.com/nuxt-community/axios-module#options
   },
 
-  buildModules: ["@nuxtjs/vuetify"],
+  buildModules: ["@nuxtjs/vuetify","@nuxtjs/moment"],
 
   /*
    ** Build configuration
