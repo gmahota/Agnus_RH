@@ -108,6 +108,8 @@
 </template>
 <script>
 import axios from "axios";
+import * as geolib from 'geolib';
+import getDistance from 'geolib/es/getDistance';
 
 export default {
   data: () => ({
@@ -229,7 +231,8 @@ export default {
               Employee: self.getEmployee(childData.employee),
               phoneNumber: childData.phoneNumber,
               type: childData.type,
-              status: self.getStatus(childData)
+              status: self.getStatus(childData),
+              geoValidade:self.getGeoStatus(childData)
             };
 
             returnArr.push(item);
@@ -256,7 +259,6 @@ export default {
         return this.Locations.find(p => p.code === item);
       } catch {}
     },
-
     getEmployee(item) {
       try {
         return this.Employees.find(p => p.code === item);
@@ -309,6 +311,30 @@ export default {
           return "Extra Hour 100%";
         }
       }
+    },
+
+    getGeoStatus(item) {
+      //Extra Hour 100% Extra Hour 50% Missed Delay Early
+
+      var Location = this.getLocation(item.location);
+
+      var distance = getDistance(
+        {latitude:Location.position.lat,longitude: Location.position.lng},
+        {latitude:item.latitude,longitude: item.longitude}
+      )
+
+      distance = geolib.convertDistance(distance, 'km');
+
+      if(distance > 3){
+        return "Wrong Location";
+      }else{
+        return "Good Location";
+      }
+
+      return distance
+
+
+
     },
 
     slipt(item, i) {

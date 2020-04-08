@@ -49,6 +49,7 @@ export default {
   plugins: [
     { src: "~/plugins/chartist", mode: "client" },
     { src: "~/plugins/google-maps" },
+    { src: "~/plugins/geolib" },
   ],
 
   /*
