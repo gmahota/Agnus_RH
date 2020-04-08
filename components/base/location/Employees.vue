@@ -170,7 +170,7 @@ export default {
     this.Employees = [];
     let self = this;
 
-    await this.$fireDb.ref("employee").orderByChild("location").equalTo(this.locationKey).once("value", function(snapshot) {
+    await this.$fireDb.ref("employee").orderByChild("location").equalTo(currentQuery).once("value", function(snapshot) {
         let returnArr = [];
         snapshot.forEach(function(childSnapshot) {
           try {

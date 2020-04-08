@@ -117,8 +117,11 @@ export default {
         await self.getCount(item.code).then(resolve => {
           this.Locations[i].employees = resolve;
         });
-      }
+        await self.getCountPickTime(item.code).then(resolve => {
+          this.Locations[i].clockIn = resolve;
+        });
 
+      }
     } catch (e) {
       console.log(e);
 
@@ -133,10 +136,10 @@ export default {
       this.$router.push(`/location/create`);
       this.$forceUpdate();
     },
-    async menuAction(item,loc) {
+    async menuAction(item, loc) {
       switch (item.id) {
         case 1:
-          this.$router.push(`/location/employees?location=`+loc.code);
+          this.$router.push(`/location/employees?location=` + loc.code);
           this.$forceUpdate();
           break;
         case 2:
@@ -144,7 +147,7 @@ export default {
         case 3:
           break;
         case 4:
-          this.$router.push(`/location/employees?location=`+loc.code);
+          this.$router.push(`/location/employees?location=` + loc.code);
           this.$forceUpdate();
           break;
         case 5:
@@ -168,14 +171,40 @@ export default {
           });
         });
 
+      return count;
+    },
 
+    async getCountPickTime(locationId) {
+      let count = 0;
+
+      var ref = this.$fireDb.ref("attendance");
+
+      var a = await ref
+        .orderByChild("location")
+        .equalTo(locationId)
+        .once("value", function(snapshot) {
+          snapshot.forEach(function(childSnapshot) {
+            var childKey = childSnapshot.key;
+            var childData = childSnapshot.val();
+
+            var date = new Date();
+            console.log(date)
+            if (
+              // date.getDay() === childData.date.dayOfMonth &&
+              // date.getMonth() === childData.date.monthValue &&
+              // date.getFullYear() === childData.date.year &&
+              childData.type === "Clock-In"
+            ) {
+              count++;
+              console.log("0")
+            }
+          });
+        });
 
       return count;
     },
 
-    async getData() {
-
-    },
+    async getData() {},
 
     async initData() {
       this.loading = !this.loading;
