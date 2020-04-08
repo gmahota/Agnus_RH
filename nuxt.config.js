@@ -50,6 +50,7 @@ export default {
     { src: "~/plugins/chartist", mode: "client" },
     { src: "~/plugins/google-maps" },
     { src: "~/plugins/geolib" },
+    { src: "~/plugins/excel-xlsx", mode: "client"}
   ],
 
   /*

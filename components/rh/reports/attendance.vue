@@ -76,6 +76,16 @@
             <v-col>
               <v-btn small style="height:24px" color="primary" @click="createUser">Update</v-btn>
             </v-col>
+            <v-col>
+              <vue-excel-xlsx
+                :data="data"
+                :columns="columns"
+                :filename="'attendance'"
+                :sheetname="'clockTimePicker'"
+              >
+                <v-icon>mdi-file-document-outline</v-icon>Download
+              </vue-excel-xlsx>
+            </v-col>
           </v-row>
           <v-row>
             <v-flex>
@@ -108,8 +118,8 @@
 </template>
 <script>
 import axios from "axios";
-import * as geolib from 'geolib';
-import getDistance from 'geolib/es/getDistance';
+import * as geolib from "geolib";
+import getDistance from "geolib/es/getDistance";
 
 export default {
   data: () => ({
@@ -145,8 +155,18 @@ export default {
       { text: "Phone Number", value: "phoneNumber" },
       { text: "Type", value: "type" },
       { text: "Time Status", value: "status" },
-      { text: "Gelocation Status", value: "geoValidade" },
-    ]
+      { text: "Gelocation Status", value: "geoValidade" }
+    ],
+    columns: [
+      { label: "Location", field: "location" },
+      { label: "Data", field: "date" },
+      { label: "Employee", field: "employee" },
+      { label: "Phone Number", field: "phoneNumber" },
+      { label: "Type", field: "type" },
+      { label: "Time Status", field: "status" },
+      { label: "Gelocation Status", field: "geoValidade" }
+    ],
+    data: []
   }),
 
   created() {
@@ -158,6 +178,18 @@ export default {
       this.Items = this.Attendance.filter(
         p => this.location === "" || p.location === this.location
       );
+      this.data = [];
+      this.Items.forEach(function(item) {
+        this.data.push({
+          location: item.Location.name,
+          date: item.date,
+          employee: item.Employee.name,
+          phoneNumber: item.phoneNumber,
+          type: item.type,
+          status: item.status,
+          geoValidade: item.geoValidade
+        });
+      });
     }
   },
 
@@ -166,6 +198,7 @@ export default {
       this.Locations = [];
       this.Items = [];
       this.Employees = [];
+      this.data = [];
       let self = this;
 
       await this.$fireDb.ref("location").once("value", function(snapshot) {
@@ -232,10 +265,20 @@ export default {
               phoneNumber: childData.phoneNumber,
               type: childData.type,
               status: self.getStatus(childData),
-              geoValidade:self.getGeoStatus(childData)
+              geoValidade: self.getGeoStatus(childData)
             };
 
             returnArr.push(item);
+
+            self.data.push({
+              location: item.Location.name,
+              date: item.date,
+              employee: item.Employee.name,
+              phoneNumber: item.phoneNumber,
+              type: item.type,
+              status: item.status,
+              geoValidade: item.geoValidade
+            });
 
             self.Items = returnArr;
             self.Attendance = returnArr;
@@ -287,7 +330,7 @@ export default {
 
         if (hourDiff < 0 && hourDiff * -1 > 8) {
           return "Missed";
-        }else{
+        } else {
           return "Delay";
         }
       }
@@ -307,7 +350,7 @@ export default {
 
         if (hourDiff < 0 && hourDiff * -1 < 3) {
           return "Extra Hour 50%";
-        }else{
+        } else {
           return "Extra Hour 100%";
         }
       }
@@ -319,22 +362,17 @@ export default {
       var Location = this.getLocation(item.location);
 
       var distance = getDistance(
-        {latitude:Location.position.lat,longitude: Location.position.lng},
-        {latitude:item.latitude,longitude: item.longitude}
-      )
+        { latitude: Location.position.lat, longitude: Location.position.lng },
+        { latitude: item.latitude, longitude: item.longitude }
+      );
 
-      distance = geolib.convertDistance(distance, 'km');
+      distance = geolib.convertDistance(distance, "km");
 
-      if(distance > 3){
+      if (distance > 2) {
         return "Wrong Location";
-      }else{
+      } else {
         return "Good Location";
       }
-
-      return distance
-
-
-
     },
 
     slipt(item, i) {
