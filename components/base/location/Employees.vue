@@ -143,7 +143,7 @@ export default {
         jobTitle: "",
         notes: "",
         location: null,
-        status: null
+        status: "Active"
       },
       headers: [
         { text: "Code", value: "code" },
@@ -170,7 +170,6 @@ export default {
     this.employeeModel.location = this.locationKey;
     this.Employees = [];
     let self = this;
-
 
     await this.$fireDb
       .ref("employee")
@@ -229,12 +228,11 @@ export default {
               };
 
               returnArr.push(item);
-
-              self.Locations = returnArr;
             } catch (e) {
               console.log(e);
             }
           });
+          self.Locations = returnArr;
         });
 
       } catch (e) {
@@ -305,6 +303,7 @@ export default {
     },
 
     deleteItem(value) {
+      console.log(value);
       this.Employees.splice(value);
     },
 

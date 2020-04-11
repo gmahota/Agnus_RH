@@ -118,11 +118,13 @@ export default {
 
               returnArr.push(item);
 
-              self.Locations = returnArr;
+
             } catch (e) {
               console.log(e);
             }
           });
+
+          self.Locations = returnArr;
         });
 
         for (var i = 0; i < this.Locations.length; i++) {
