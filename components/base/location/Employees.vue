@@ -7,7 +7,7 @@
       <v-row>
         <v-label color="primary">
           Now let's Add Employees to clock in and out of this location
-          <v-btn @click="dialog = !dialog">
+          <v-btn @click="newEmployee">
             <v-icon color="primary">mdi-plus-circle</v-icon>
           </v-btn>
         </v-label>
@@ -19,30 +19,16 @@
           :items="Employees"
           single-select
           :items-per-page="25"
-          item-key="code"
+          item-key="id"
           class="elevation-0"
           :loading="loading"
           loading-text="Loading products. Please wait"
         >
-          <template slot="headerCell" slot-scope="{ header }">
-            <span class="subheading font-weight-light text--darken-3" v-text="header.text" />
-          </template>
-          <template slot="items" slot-scope="{ item }">
-            <td>{{ item.code }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.email }}</td>
-            <td>{{ item.phoneNumber }}</td>
-            <td>{{ item.jobTitle }}</td>
-            <td>{{ item.notes }}</td>
-            <td>{{ item.status }}</td>
-            <td>
-              <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-              <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
-            </td>
-          </template>
 
-          <template v-slot:item.action>
-            <v-icon @click="deleteItem" small color="error">mdi-delete</v-icon>
+
+          <template v-slot:item.action = "{ item }">
+            <v-icon @click="deleteItem(item)" small color="error">mdi-delete</v-icon>
+            <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
           </template>
         </v-data-table>
 
@@ -74,6 +60,7 @@
               <v-col>
                 <v-text-field v-model="employeeModel.phoneNumber" label="Phone Number"></v-text-field>
               </v-col>
+
             </v-row>
 
             <v-row>
@@ -90,6 +77,17 @@
                   item-text="description"
                   item-value="code"
                 ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                v-model="employeeModel.location"
+                 label="Location"
+                 :items="Locations"
+                  clearable
+                  data-vv-name="employeeModel.location"
+                  item-text="name"
+                  item-value="code"
+                 ></v-select>
               </v-col>
             </v-row>
 
@@ -164,13 +162,21 @@ export default {
       ]
     };
   },
-  async beforeMount(){
+  async beforeMount() {
+
+    this.getLocation();
+
     this.locationKey = this.$route.query.location;
     this.employeeModel.location = this.locationKey;
     this.Employees = [];
     let self = this;
 
-    await this.$fireDb.ref("employee").orderByChild("location").equalTo(currentQuery).once("value", function(snapshot) {
+
+    await this.$fireDb
+      .ref("employee")
+      .orderByChild("location")
+      .equalTo(this.locationKey)
+      .once("value", function(snapshot) {
         let returnArr = [];
         snapshot.forEach(function(childSnapshot) {
           try {
@@ -178,13 +184,14 @@ export default {
             var childData = childSnapshot.val();
 
             var item = {
-              code: childKey,
+              id: childKey,
+              code: childData.code,
               name: childData.name,
-              email:childData.email,
-              jobTitle:childData.jobTitle,
+              email: childData.email,
+              jobTitle: childData.jobTitle,
               location: childData.location,
-              notes:childData.notes,
-              phoneNumber:childData.phoneNumber,
+              notes: childData.notes,
+              phoneNumber: childData.phoneNumber,
               status: childData.status
             };
 
@@ -203,6 +210,56 @@ export default {
     }
   },
   methods: {
+    async getLocation() {
+      try {
+        this.Locations = [];
+
+        let self = this;
+
+        await this.$fireDb.ref("location").once("value", function(snapshot) {
+          let returnArr = [];
+          snapshot.forEach(function(childSnapshot) {
+            try {
+              var childKey = childSnapshot.key;
+              var childData = childSnapshot.val();
+
+              var item = {
+                code: childKey,
+                name: childData.name
+              };
+
+              returnArr.push(item);
+
+              self.Locations = returnArr;
+            } catch (e) {
+              console.log(e);
+            }
+          });
+        });
+
+      } catch (e) {
+        console.log(e);
+
+        alert(
+          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+        );
+      }
+    },
+    newEmployee: function() {
+      this.employeeModel = {
+        id: "",
+        code: "",
+        name: "",
+        email: "",
+        phoneNumber: "",
+        jobTitle: "",
+        notes: "",
+        location: this.locationKey,
+        status: null
+      };
+
+      this.dialog = true;
+    },
     setLocation: function(item) {
       this.markers = [];
 
@@ -273,13 +330,36 @@ export default {
 
     async saveEmployee() {
       try {
-        const dataRef = this.$fireDb.ref("employee");
+        let key = this.employeeModel.id;
+        let newEmployee = {
+          code: this.employeeModel.code,
+          name: this.employeeModel.name,
+          email: this.employeeModel.email,
+          phoneNumber: this.employeeModel.phoneNumber,
+          jobTitle: this.employeeModel.jobTitle,
+          notes: this.employeeModel.notes,
+          location: this.employeeModel.location,
+          status: this.employeeModel.status
+        };
 
-        var newChildRef = dataRef.push();
+        if (key === "") {
+          const dataRef = this.$fireDb.ref("employee");
 
-        await newChildRef.set(this.employeeModel);
+          var newChildRef = dataRef.push();
 
-        this.Employees.push(this.employeeModel);
+          await newChildRef.set(newEmployee);
+          this.Employees.push(this.employeeModel);
+
+        } else {
+          var newChildRef = this.$fireDb.ref().child("/employee/" + key);
+
+          await newChildRef.set(newEmployee);
+        }
+
+        if(this.employeeModel.location != this.locationKey){
+          this.Employees.splice(this.employeeModel);
+        }
+
         this.close();
       } catch (e) {
         console.log(e);
@@ -289,57 +369,6 @@ export default {
         );
       }
     },
-
-    async saveLocation() {
-      this.processing = true;
-
-      //Validation
-      if (this.location.name === "") {
-        alert("The location name is mandatory!");
-        this.processing = false;
-        return;
-      }
-
-      try {
-        const locationRef = this.$fireDb.ref("location");
-
-        var newChildRef = locationRef.push();
-
-        this.locationKey = newChildRef.key;
-        this.employeeModel.location = this.locationKey;
-
-        await newChildRef.set(this.location);
-        this.e1 = 2;
-      } catch (e) {
-        console.log(e);
-
-        alert(
-          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
-        );
-      }
-
-      this.processing = false;
-    },
-    async updateLocation(e1) {
-      this.processing = true;
-
-      try {
-        const locationRef = this.$fireDb
-          .ref("location")
-          .child(this.locationKey);
-
-        await locationRef.update(this.location);
-        this.e1 = e1;
-      } catch (e) {
-        console.log(e);
-        alert(
-          "Ocorreu um erro durante a actualização da localização. Contacte os Administradores do Sistema!!"
-        );
-      }
-
-      this.processing = false;
-    },
-
     async finishSetup() {
       console.log;
       var url = `/locations`;

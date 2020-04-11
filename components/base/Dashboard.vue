@@ -75,53 +75,17 @@ export default {
     location: "",
     Locations: [],
     items: [
-      { id: 1, title: "Convidar Fúncionarios", icon: "mdi-dialpad" },
-      { id: 2, title: "Editar", icon: "mdi-pencil" },
-      { id: 3, title: "Ver Fúncionarios", icon: "mdi-account-multiple" },
-      { id: 4, title: "Relátorios", icon: "mdi-playlist-check" },
-      { id: 5, title: "Desativar", icon: "mdi-delete-forever" },
-      { id: 6, title: "Apagar", icon: "mdi-delete" }
+      { id: 1, title: "Invite Employees", icon: "mdi-dialpad" },
+      { id: 2, title: "Edit Locations", icon: "mdi-pencil" },
+      { id: 3, title: "View Employees", icon: "mdi-account-multiple" },
+      { id: 4, title: "Reports", icon: "mdi-playlist-check" },
+      { id: 5, title: "Inactive", icon: "mdi-delete-forever" },
+      { id: 6, title: "Delete", icon: "mdi-delete" }
     ]
   }),
   async beforeMount() {
     try {
-      this.Locations = [];
-
-      let self = this;
-
-      await this.$fireDb.ref("location").once("value", function(snapshot) {
-        let returnArr = [];
-        snapshot.forEach(function(childSnapshot) {
-          try {
-            var childKey = childSnapshot.key;
-            var childData = childSnapshot.val();
-
-            var item = {
-              code: childKey,
-              employees: 0,
-              clockIn: 0,
-              location: childData
-            };
-
-            returnArr.push(item);
-
-            self.Locations = returnArr;
-          } catch (e) {
-            console.log(e);
-          }
-        });
-      });
-
-      for (var i = 0; i < this.Locations.length; i++) {
-        var item = this.Locations[i];
-        await self.getCount(item.code).then(resolve => {
-          this.Locations[i].employees = resolve;
-        });
-        await self.getCountPickTime(item.code).then(resolve => {
-          this.Locations[i].clockIn = resolve;
-        });
-
-      }
+      this.getLocation();
     } catch (e) {
       console.log(e);
 
@@ -132,6 +96,52 @@ export default {
   },
 
   methods: {
+    async getLocation() {
+      try {
+        this.Locations = [];
+
+        let self = this;
+
+        await this.$fireDb.ref("location").once("value", function(snapshot) {
+          let returnArr = [];
+          snapshot.forEach(function(childSnapshot) {
+            try {
+              var childKey = childSnapshot.key;
+              var childData = childSnapshot.val();
+
+              var item = {
+                code: childKey,
+                employees: 0,
+                clockIn: 0,
+                location: childData
+              };
+
+              returnArr.push(item);
+
+              self.Locations = returnArr;
+            } catch (e) {
+              console.log(e);
+            }
+          });
+        });
+
+        for (var i = 0; i < this.Locations.length; i++) {
+          var item = this.Locations[i];
+          await self.getCount(item.code).then(resolve => {
+            this.Locations[i].employees = resolve;
+          });
+          await self.getCountPickTime(item.code).then(resolve => {
+            this.Locations[i].clockIn = resolve;
+          });
+        }
+      } catch (e) {
+        console.log(e);
+
+        alert(
+          "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+        );
+      }
+    },
     addLocation() {
       this.$router.push(`/location/create`);
       this.$forceUpdate();
@@ -145,10 +155,10 @@ export default {
         case 2:
           break;
         case 3:
-          break;
-        case 4:
           this.$router.push(`/location/employees?location=` + loc.code);
           this.$forceUpdate();
+          break;
+        case 4:
           break;
         case 5:
           break;
@@ -188,7 +198,7 @@ export default {
             var childData = childSnapshot.val();
 
             var date = new Date();
-            console.log(date)
+            console.log(date);
             if (
               // date.getDay() === childData.date.dayOfMonth &&
               // date.getMonth() === childData.date.monthValue &&
@@ -196,7 +206,7 @@ export default {
               childData.type === "Clock-In"
             ) {
               count++;
-              console.log("0")
+              console.log("0");
             }
           });
         });
