@@ -145,7 +145,7 @@ export default {
       }
     },
     addLocation() {
-      this.$router.push(`/location/create`);
+      this.$router.push(`/location/create`, () => this.$router.go(0));
       this.$forceUpdate();
     },
     async menuAction(item, loc) {

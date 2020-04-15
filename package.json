@@ -1,8 +1,8 @@
 {
-  "name": "nuxtjs-dashboard",
+  "name": "koattendance",
   "version": "1.0.0",
-  "description": "NuxtJs Dashboard",
-  "author": "Jimmy Jouanne",
+  "description": "Ko Attendance",
+  "author": "Guimarães Mahota",
   "private": true,
   "scripts": {
     "dev": "nuxt",

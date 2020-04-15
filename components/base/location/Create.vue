@@ -246,7 +246,6 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import axios from "axios";
 
 export default {
   data() {
@@ -455,7 +454,8 @@ export default {
     }
   },
   mounted: function() {
-    this.geolocation();
+    this.$gmapDefaultResizeBus;
+        this.geolocation();
   },
   computed: {
     ...mapGetters({

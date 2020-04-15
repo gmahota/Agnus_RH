@@ -5,7 +5,7 @@
 import quickReport from "@/components/rh/reports/quick.vue";
 
 export default {
-  layout: "dashboard",
+  layout: "attendance",
   components: {
     quickReport
   }

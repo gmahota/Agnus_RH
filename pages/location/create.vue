@@ -5,7 +5,7 @@
 import create from "@/components/base/location/Create.vue";
 
 export default {
-  layout: "dashboard",
+  layout: "attendance",
   components: {
     create
   }

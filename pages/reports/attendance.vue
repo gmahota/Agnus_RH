@@ -5,7 +5,7 @@
 import attendance from "@/components/rh/reports/attendance.vue";
 
 export default {
-  layout: "dashboard",
+  layout: "attendance",
   components: {
     attendance
   }

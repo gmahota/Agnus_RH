@@ -54,7 +54,9 @@
       async authenticate() {
         if (!this.isDisabled) {
           await this.setUsername(this.defaultUserPassword);
-          this.$router.push({ path: 'dashboard' });
+          //this.$router.push({ path: 'dashboard' });
+          this.$router.push({ name:'dashboard' }, () => this.$router.go(0));
+          this.$forceUpdate();
         }
       }
     }

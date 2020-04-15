@@ -5,7 +5,7 @@
 import employees from "@/components/base/location/Employees.vue";
 
 export default {
-  layout: "dashboard",
+  layout: "attendance",
   components: {
     employees
   }

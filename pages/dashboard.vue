@@ -50,137 +50,28 @@
           sub-text="Just Updated"
         />
       </v-flex>
-      <v-flex md12 lg6>
-        <material-card
-          color="orange"
-          title="Employee Stats"
-          text="New employees on 13th March, 2020"
-        >
-          <v-data-table :headers="headers" :items="items" hide-actions>
-            <template slot="headerCell" slot-scope="{ header }">
-              <span class="font-weight-light text-warning text--darken-3" v-text="header.text" />
-            </template>
-            <template slot="items" slot-scope="{ index, item }">
-              <td>{{ index + 1 }}</td>
-              <td>{{ item.name }}</td>
-              <td class="text-xs-right">{{ item.location }}</td>
-              <td class="text-xs-right">{{ item.country }}</td>
-              <td class="text-xs-right">{{ item.city }}</td>
-            </template>
-          </v-data-table>
-        </material-card>
-      </v-flex>
-      <v-flex md12 lg6>
-        <material-card class="card-tabs" color="green">
-          <v-flex slot="header">
-            <v-tabs v-model="tabs" color="transparent" slider-color="white">
-              <span class="subheading font-weight-light mr-3" style="align-self: center">Tasks:</span>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">mdi-bug</v-icon>Bugs
-              </v-tab>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">mdi-code-tags</v-icon>Website
-              </v-tab>
-              <v-tab>
-                <v-icon class="mr-2">mdi-cloud</v-icon>Server
-              </v-tab>
-            </v-tabs>
-          </v-flex>
 
-          <v-tabs-items v-model="tabs">
-            <v-tab-item v-for="n in 3" :key="n">
-              <v-list three-line>
-                <v-list-tile @click="complete(0)">
-                  <v-list-tile-action>
-                    <v-checkbox :value="list[0]" color="green" />
-                  </v-list-tile-action>
-                  <v-list-tile-title>Sincronizar Filial de Xai-xai</v-list-tile-title>
-                  <div class="d-flex">
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="success" icon>
-                        <v-icon color="primary">mdi-pencil</v-icon>
-                      </v-btn>
-                      <span>Edit</span>
-                    </v-tooltip>
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="danger" icon>
-                        <v-icon color="error">mdi-close</v-icon>
-                      </v-btn>
-                      <span>Close</span>
-                    </v-tooltip>
-                  </div>
-                </v-list-tile>
-                <v-divider />
-                <v-list-tile @click="complete(1)">
-                  <v-list-tile-action>
-                    <v-checkbox :value="list[1]" color="success" />
-                  </v-list-tile-action>
-                  <v-list-tile-title>Sincronizar Filial da Beira</v-list-tile-title>
-                  <div class="d-flex">
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="success" icon>
-                        <v-icon color="primary">mdi-pencil</v-icon>
-                      </v-btn>
-                      <span>Edit</span>
-                    </v-tooltip>
-
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="danger" icon>
-                        <v-icon color="error">mdi-close</v-icon>
-                      </v-btn>
-                      <span>Close</span>
-                    </v-tooltip>
-                  </div>
-                </v-list-tile>
-                <v-divider />
-                <v-list-tile @click="complete(2)">
-                  <v-list-tile-action>
-                    <v-checkbox :value="list[2]" color="success" />
-                  </v-list-tile-action>
-                  <v-list-tile-title>Sincronizar Filial da Nampula</v-list-tile-title>
-                  <div class="d-flex">
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="success" icon>
-                        <v-icon color="primary">mdi-pencil</v-icon>
-                      </v-btn>
-                      <span>Edit</span>
-                    </v-tooltip>
-                    <v-tooltip top content-class="top">
-                      <v-btn slot="activator" class="v-btn--simple" color="danger" icon>
-                        <v-icon color="error">mdi-close</v-icon>
-                      </v-btn>
-                      <span>Close</span>
-                    </v-tooltip>
-                  </div>
-                </v-list-tile>
-              </v-list>
-            </v-tab-item>
-          </v-tabs-items>
-        </material-card>
-      </v-flex>
+      <maps></maps>
     </v-layout>
   </v-container>
 </template>
 
 <script>
-import materialCard from "~/components/material/AppCard";
-import materialChartCard from "~/components/material/AppChartCard";
 import materialStatsCard from "~/components/material/AppStatsCard";
+import maps from "~/components/base/location/Maps"
 
-import axios from "axios";
 import * as geolib from "geolib";
 import getDistance from "geolib/es/getDistance";
 
 export default {
-  layout: "dashboard",
-  middleware: "authentication",
+  layout: "attendance",
   components: {
-    materialCard,
-    materialChartCard,
-    materialStatsCard
+    materialStatsCard,
+    maps
   },
   data() {
     return {
+      processing: false,
       dailySalesChart: {
         data: {
           labels: ["M", "T", "W", "T", "F", "S", "S"],
@@ -332,17 +223,16 @@ export default {
         2: false
       },
       Employees: [],
-      Employees: [],
       Items: [],
       Attendance: {
         Early: 0,
         _Early: "0",
         Late: 0,
-        _Late:"0",
+        _Late: "0",
         Absent: 0,
-        _Absent:"0",
+        _Absent: "0",
         Total: 0,
-        _Total:"0"
+        _Total: "0"
       }
     };
   },
@@ -356,29 +246,29 @@ export default {
         let self = this;
 
         await this.$fireDb.ref("location").once("value", function(snapshot) {
-        let returnArr = [];
-        snapshot.forEach(function(childSnapshot) {
-          try {
-            var childKey = childSnapshot.key;
-            var childData = childSnapshot.val();
+          let returnArr = [];
+          snapshot.forEach(function(childSnapshot) {
+            try {
+              var childKey = childSnapshot.key;
+              var childData = childSnapshot.val();
 
-            var item = {
-              code: childKey,
-              name: childData.name,
-              clockIn: childData.clockIn,
-              clockOut: childData.clockOut,
-              gracePeriod: childData.gracePeriod,
-              position: childData.position
-            };
+              var item = {
+                code: childKey,
+                name: childData.name,
+                clockIn: childData.clockIn,
+                clockOut: childData.clockOut,
+                gracePeriod: childData.gracePeriod,
+                position: childData.position
+              };
 
-            returnArr.push(item);
+              returnArr.push(item);
 
-            self.Locations = returnArr;
-          } catch (e) {
-            console.log(e);
-          }
+              self.Locations = returnArr;
+            } catch (e) {
+              console.log(e);
+            }
+          });
         });
-      });
 
         await this.$fireDb.ref("attendance").once("value", function(snapshot) {
           let returnArr = [];
@@ -403,15 +293,22 @@ export default {
               returnArr.push(item);
 
               self.Attendance.Early =
-                self.Attendance.Total/ self.Attendance.Early  ;
+                self.Attendance.Total / self.Attendance.Early;
               self.Attendance.Late =
-                self.Attendance.Total/ self.Attendance.Late  ;
-              self.Attendance.Absent = self.Attendance.Total/ self.Attendance.Absent  ;
+                self.Attendance.Total / self.Attendance.Late;
+              self.Attendance.Absent =
+                self.Attendance.Total / self.Attendance.Absent;
 
-              self.Attendance._Early = self.Attendance.Early.toFixed(0).toString();
-              self.Attendance._Late = self.Attendance.Late.toFixed(0).toString();
-              self.Attendance._Absent = 0;//self.Attendance.Absent.toString();
-              self.Attendance._Total = self.Attendance.Total.toFixed(0).toString();
+              self.Attendance._Early = self.Attendance.Early.toFixed(
+                0
+              ).toString();
+              self.Attendance._Late = self.Attendance.Late.toFixed(
+                0
+              ).toString();
+              self.Attendance._Absent = 0; //self.Attendance.Absent.toString();
+              self.Attendance._Total = self.Attendance.Total.toFixed(
+                0
+              ).toString();
 
               self.Items = returnArr;
             } catch (e) {
@@ -589,35 +486,13 @@ export default {
     this.initData();
   },
 
-  mounted() {
-    this.$nextTick(() => {
-      /*this.dailySalesChart.options = {
-          lineSmooth: this.$chartist.Interpolation.cardinal({
-            tension: 0
-          }),
-          low: 0,
-          high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-          }
-        };
-        this.dataCompletedTasksChart.options = {
-          lineSmooth: this.$chartist.Interpolation.cardinal({
-            tension: 0
-          }),
-          low: 0,
-          high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-          }
-        };*/
-    });
-  }
+  mounted: function() {}
 };
 </script>
+<style lang="scss" scoped>
+.vue-map-container {
+  height: 450px;
+  max-width: 992px;
+  width: 100%;
+}
+</style>
