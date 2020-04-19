@@ -161,10 +161,18 @@ export default {
           this.$forceUpdate();
           break;
         case 4:
+          this.$router.push(`/reports/quick?location=` + loc.code);
+          this.$forceUpdate();
           break;
         case 5:
           break;
         case 6:
+          let locationRef = this.$fireDb.ref('location/' + loc.code);
+
+          locationRef.remove();
+
+          this.Locations.splice(this.Locations.indexOf(loc), 1);
+
           break;
       }
     },

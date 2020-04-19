@@ -303,8 +303,10 @@ export default {
     },
 
     deleteItem(value) {
-      console.log(value);
-      this.Employees.splice(value);
+      let employeeRef = this.$fireDb.ref('employee/' + value.id);
+
+      employeeRef.remove();
+      this.Employees.splice(this.Employees.indexOf(value), 1);
     },
 
     editItem(value) {

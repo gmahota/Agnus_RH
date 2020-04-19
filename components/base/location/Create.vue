@@ -370,8 +370,6 @@ export default {
     },
 
     async saveEmployee() {
-
-
       try {
 
         const dataRef = this.$fireDb.ref("employee");
@@ -390,13 +388,10 @@ export default {
           "Ocorreu um erro durante a gravação da Fúncionario. Contacte os Administradores do Sistema!!"
         );
       }
-
-
     },
 
     async saveLocation() {
       this.processing = true;
-
 
       //Validation
       if (this.location.name === "") {
