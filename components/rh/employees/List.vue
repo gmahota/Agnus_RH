@@ -27,14 +27,16 @@ export default {
         text: "Id",
         align: "start",
         sortable: false,
-        value: "id"
+        value: "code"
       },
-      { text: "Nome", value: "first_name" },
-      { text: "Apelido", value: "last_name" },
-      { text: "Celular", value: "cellular" },
+      { text: "Nome", value: "name" },
+      { text: "Email", value: "email" },
+      {text: 'Contacto', value: "phoneNumber"},
+      { text: "Funcao", value: "JobTitle" },
       { text: "Localizacao", value: "location" },
       { text: "Actions", align: "end", value: "actions", sortable: false }
     ],
+    
     employees: [],
     firbase_db_url: 'https://iclock-f3c15.firebaseio.com/'
   }),
