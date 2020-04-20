@@ -19,14 +19,12 @@
         <v-col>
           <v-select
             v-model="location"
-            :items="Location"
+            :items="Locations"
             clearable
-            label="Localização"
-            return-object
-            v-validate="'required'"
+            label="Locations"
             data-vv-name="location"
-            item-text="nome"
-            item-value="ID"
+            item-text="name"
+            item-value="code"
           ></v-select>
         </v-col>
         <v-col>
@@ -36,7 +34,6 @@
             clearable
             label="Periodo"
             return-object
-            v-validate="'required'"
             data-vv-name="Period"
             item-text="description"
             item-value="code"
@@ -46,20 +43,46 @@
       <v-row>
         <v-col>
           <label>
-            Cedo:
+            Early
             <v-icon small color="primary">mdi-checkbox-blank-circle</v-icon>
-          </label>
-          <label>
-            Atrazado:
-            <v-icon small color="error">mdi-checkbox-blank-circle</v-icon>
-          </label>
-          <label>
-            Faltou:
-            <v-icon small color="danger">mdi-checkbox-blank-circle</v-icon>
           </label>
         </v-col>
         <v-col>
-          <v-btn small style="height:24px" color="primary">Download</v-btn>
+          <label>
+            Late
+            <v-icon small color="yellow">mdi-checkbox-blank-circle</v-icon>
+          </label>
+        </v-col>
+        <v-col>
+          <label>
+            Missed
+            <v-icon small color="error">mdi-checkbox-blank-circle</v-icon>
+          </label>
+        </v-col>
+        <v-col>
+          <label>
+            Extra Hour 50%
+            <v-icon small color="green">mdi-checkbox-blank-circle</v-icon>
+          </label>
+        </v-col>
+        <v-col>
+          <label>
+            Extra Hour 100%
+            <v-icon small color="green">mdi-checkbox-blank-circle</v-icon>
+          </label>
+        </v-col>
+        <v-col>
+          <v-btn small style="height:24px" color="primary" @click="calculate">Update</v-btn>
+        </v-col>
+        <v-col>
+          <vue-excel-xlsx
+            :data="items"
+            :columns="columns"
+            :filename="'ReportTime'"
+            :sheetname="period"
+          >
+            <v-icon>mdi-file-document-outline</v-icon>Download
+          </vue-excel-xlsx>
         </v-col>
       </v-row>
       <v-row>
@@ -190,24 +213,8 @@ export default {
       //   totalAbsent: 1
       // }
     ],
-    employeeModel: {
-      code: "",
-      name: "",
-      phoneNumber: "",
-      location: null,
-      status: null
-    },
     location: "",
-    Location: [
-      {
-        code: "Maputo",
-        description: "Sede - Maputo"
-      },
-      {
-        code: "Maputo2",
-        description: "Posto 2 - Maputo"
-      }
-    ],
+    Locations: [],
     Status: [
       {
         code: "Active",
@@ -222,29 +229,61 @@ export default {
         description: "Inveted"
       }
     ],
-    Period: ["Esta Semana", ""],
-    period: "Esta Semana",
+    Period: ["Week", ""],
+    period: "Week",
     dialog: false,
     formTitle: "Employees Data",
     loading: false,
-    headers: [
-      { text: "Employ Name", value: "name" },
-      { text: "Segunda 30/3/2020", value: "segunda" },
-      { text: "Terça 31/3/2020", value: "terça" },
-      { text: "Quarta 01/4/2020", value: "quarta" },
-      { text: "Quinta 02/4/2020", value: "quinta" },
-      { text: "Sexta 03/4/2020", value: "sexta" },
-      { text: "Sabado 04/4/2020", value: "sabado" },
-      { text: "Domingo 05/4/2020", value: "domingo" },
-      { text: "TotalDays Early", value: "totalEarly" },
-      { text: "TotalDays Late", value: "totalLate" },
-      { text: "TotalDays Absent", value: "totalAbsent" }
-    ]
+
+    defaultWeekdays: [],
+    days: [],
+    headers: [],
+    columns: []
   }),
 
   created() {
     //this.postData();
     this.initData();
+  },
+
+  async beforeMount() {
+    this.loading = !this.loading;
+    try {
+      this.Locations = [];
+      let self = this;
+
+      await this.$fireDb.ref("location").once("value", function(snapshot) {
+        let returnArr = [];
+        snapshot.forEach(function(childSnapshot) {
+          try {
+            var childKey = childSnapshot.key;
+            var childData = childSnapshot.val();
+
+            var item = {
+              code: childKey,
+              name: childData.name,
+              clockIn: childData.clockIn,
+              clockOut: childData.clockOut,
+              gracePeriod: childData.gracePeriod,
+              position: childData.position
+            };
+
+            returnArr.push(item);
+
+            self.Locations = returnArr;
+          } catch (e) {
+            console.log(e);
+          }
+        });
+      });
+    } catch (e) {
+      console.log(e);
+
+      alert(
+        "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
+      );
+    }
+    this.loading = !this.loading;
   },
 
   methods: {
@@ -274,33 +313,250 @@ export default {
         .catch(error => console.log(error));
     },
 
-    async getData() {
-      axios
-        .get("https://mahotacrm.firebaseio.com/tests.json")
-        .then(response => {
-          this.items = [];
-          for (const key in response.data) {
-            this.items.push({ ...response.data[key], id: key });
-          }
-        })
-        .catch(error => console.log(error));
+    async getData(period) {
+      try {
+        let self = this;
 
-      axios
-        .get("https://mahotacrm.firebaseio.com/localizacoes.json")
-        .then(response => {
-          this.Location = [];
-          this.Location = response.data;
+        this.defaultWeekdays= [];
 
-          // for (const key in response.data) {
-          //   this.Employees.push({ ...response.data[key] , id: key})
-          // }
-        })
-        .catch(error => console.log(error));
+        switch (period) {
+          case "Week":
+            var currentDate = self.$moment();
+
+            var weekStart = currentDate.clone().startOf("isoweek");
+
+            var days = [];
+
+            for (var i = 0; i <= 6; i++) {
+              this.defaultWeekdays.push(
+                self.$moment(weekStart)
+                  .add(i, "days")
+                  );
+
+
+            }
+
+            // this.defaultWeekdays = Array.apply(null, Array(7)).map(function(
+            //   _,
+            //   i
+            // ) {
+            //   return self
+            //     .$moment(i, "e")
+            //     .startOf("week")
+            //     .isoWeekday(i + 1);
+            // });
+
+            this.days = this.defaultWeekdays;
+
+            this.headers = [
+              { text: "Employ Name", value: "name" },
+              {
+                text: this.defaultWeekdays[0].format("ddd MM/DD/YYYY"),
+                value: "segunda"
+              },
+              {
+                text: this.defaultWeekdays[1].format("ddd MM/DD/YYYY"),
+                value: "terça"
+              },
+              {
+                text: this.defaultWeekdays[2].format("ddd MM/DD/YYYY"),
+                value: "quarta"
+              },
+              {
+                text: this.defaultWeekdays[3].format("ddd MM/DD/YYYY"),
+                value: "quinta"
+              },
+              {
+                text: this.defaultWeekdays[4].format("ddd MM/DD/YYYY"),
+                value: "sexta"
+              },
+              {
+                text: this.defaultWeekdays[5].format("ddd MM/DD/YYYY"),
+                value: "sabado"
+              },
+              {
+                text: this.defaultWeekdays[6].format("ddd MM/DD/YYYY"),
+                value: "domingo"
+              },
+              { text: "TotalDays Early", value: "totalEarly" },
+              { text: "TotalDays Late", value: "totalLate" },
+              { text: "TotalDays Absent", value: "totalAbsent" },
+              { text: "TotalDays H50", value: "totalH50" },
+              { text: "TotalDays H100", value: "totalH100" }
+            ];
+
+            this.columns = [
+              { label: "Employ Name", field: "name" },
+              {
+                label: this.defaultWeekdays[0].format("MM/DD/YYYY"),
+                field: "segunda"
+              },
+              {
+                label: this.defaultWeekdays[1].format("MM/DD/YYYY"),
+                field: "terça"
+              },
+              {
+                label: this.defaultWeekdays[2].format("MM/DD/YYYY"),
+                field: "quarta"
+              },
+              {
+                label: this.defaultWeekdays[3].format("MM/DD/YYYY"),
+                field: "quinta"
+              },
+              {
+                label: this.defaultWeekdays[4].format("MM/DD/YYYY"),
+                field: "sexta"
+              },
+              {
+                label: this.defaultWeekdays[5].format("MM/DD/YYYY"),
+                field: "sabado"
+              },
+              {
+                label: this.defaultWeekdays[6].format("ddd MM/DD/YYYY"),
+                field: "domingo"
+              },
+              { label: "TotalDays Early", field: "totalEarly" },
+              { label: "TotalDays Late", field: "totalLate" },
+              { label: "TotalDays Absent", field: "totalAbsent" },
+              { label: "TotalDays H50", field: "totalH50" },
+              { label: "TotalDays H100", field: "totalH100" }
+            ];
+
+            this.getEmployeeWeekData();
+
+            break;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async getEmployeeWeekData() {
+      let self = this;
+      this.items = [];
+
+      await this.$fireDb
+        .ref("employee")
+        .orderByChild("location")
+        .equalTo(self.location)
+        .once("value", function(snapshot) {
+          let returnArr = [];
+          snapshot.forEach(function(childSnapshot) {
+            try {
+              var childKey = childSnapshot.key;
+              var childData = childSnapshot.val();
+
+              var item = {
+                period: self.period,
+                name: "Guimarães Mahota",
+                monday: null,
+                tuesday: null,
+                wednesday: null,
+                thursday: null,
+                friday: null,
+                saturday: null,
+                sunday: null,
+                totalDayEarly: 0,
+                totalDayLate: 0,
+                totalAbsent: 0,
+                totalH50: 0,
+                totalH100: 0,
+
+                code: childKey,
+                name: childData.name,
+                status: childData.status,
+                Employee: {
+                  id: childKey,
+                  data: childData
+                }
+              };
+
+              returnArr.push(item);
+            } catch (e) {
+              console.log(e);
+            }
+          });
+
+          self.items = returnArr;
+
+          self.calculateTimeClock();
+        });
+    },
+
+    async calculateTimeClock() {
+      let self = this;
+
+      this.items.forEach(function(item) {
+        try {
+          item.monday = self.getTimeClock(item.Employee.id, self.days[0]);
+          item.tuesday = self.getTimeClock(item.Employee.id, self.days[1]);
+          item.wednesday = self.getTimeClock(item.Employee.id, self.days[2]);
+          item.thursday = self.getTimeClock(item.Employee.id, self.days[3]);
+          item.friday = self.getTimeClock(item.Employee.id, self.days[4]);
+          item.saturday = self.getTimeClock(item.Employee.id, self.days[5]);
+          item.sunday = self.getTimeClock(item.Employee.id, self.days[6]);
+          item.wednesday = self.getTimeClock(item.Employee.id, self.days[7]);
+        } catch (e) {
+          console.log(e);
+        }
+      });
+    },
+
+    async getTimeClock(employee, date) {
+      try {
+        await this.$fireDb
+          .ref("attendance")
+          .orderByChild("date")
+          .startAt(this.$moment(date).format("YYYY-MM-DD"))
+          .once("value", function(snapshot) {
+            let returnArr = [];
+            snapshot.forEach(function(childSnapshot) {
+              try {
+                console.log(childSnapshot.val());
+                // var childKey = childSnapshot.key;
+                // var childData = childSnapshot.val();
+
+                // var item = {
+                //   period: self.period,
+                //   name: "Guimarães Mahota",
+                //   monday: null,
+                //   tuesday: null,
+                //   wednesday: null,
+                //   thursday: null,
+                //   friday: null,
+                //   saturday: null,
+                //   sunday: null,
+                //   totalDayEarly: 0,
+                //   totalDayLate: 0,
+                //   totalAbsent: 0,
+                //   totalH50: 0,
+                //   totalH100: 0,
+
+                //   code: childKey,
+                //   name: childData.name,
+                //   status: childData.status,
+                //   Employee: {
+                //     id: childKey,
+                //     data: childData
+                //   }
+                // };
+
+                returnArr.push(item);
+              } catch (e) {
+                console.log(e);
+              }
+            });
+
+            self.items = returnArr;
+          });
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     async initData() {
       this.loading = !this.loading;
-      this.getData();
+
       this.loading = !this.loading;
     },
 
@@ -319,6 +575,10 @@ export default {
         case "Faltou":
           return "danger";
       }
+    },
+
+    async calculate() {
+      this.getData(this.period);
     }
   }
 };

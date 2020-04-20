@@ -74,7 +74,7 @@
               </label>
             </v-col>
             <v-col>
-              <v-btn small style="height:24px" color="primary" @click="createUser">Update</v-btn>
+              <v-btn small style="height:24px" color="primary" @click="calculate">Update</v-btn>
             </v-col>
             <v-col>
               <vue-excel-xlsx
@@ -151,7 +151,7 @@ export default {
     headers: [
       { text: "Location", value: "Location.name" },
       { text: "Data", value: "date" },
-      { text: "Employee", value: "Employee.name" },
+      { text: "Employee", value: "name" },
       { text: "Phone Number", value: "phoneNumber" },
       { text: "Type", value: "type" },
       { text: "Time Status", value: "status" },
@@ -169,36 +169,12 @@ export default {
     data: []
   }),
 
-  created() {
-    //this.postData();
-    this.initData();
-  },
-  watch: {
-    location: function() {
-      this.Items = this.Attendance.filter(
-        p => this.location === "" || p.location === this.location
-      );
-      this.data = [];
-      this.Items.forEach(function(item) {
-        this.data.push({
-          location: item.Location.name,
-          date: item.date,
-          employee: item.Employee.name,
-          phoneNumber: item.phoneNumber,
-          type: item.type,
-          status: item.status,
-          geoValidade: item.geoValidade
-        });
-      });
-    }
-  },
-
   async beforeMount() {
+    this.loading = !this.loading;
+
     try {
       this.Locations = [];
-      this.Items = [];
-      this.Employees = [];
-      this.data = [];
+
       let self = this;
 
       await this.$fireDb.ref("location").once("value", function(snapshot) {
@@ -225,68 +201,6 @@ export default {
           }
         });
       });
-
-      await this.$fireDb.ref("employee").once("value", function(snapshot) {
-        let returnArr = [];
-        snapshot.forEach(function(childSnapshot) {
-          try {
-            var childKey = childSnapshot.key;
-            var childData = childSnapshot.val();
-
-            var item = {
-              code: childKey,
-              name: childData.name,
-              status: childData.status
-            };
-
-            returnArr.push(item);
-
-            self.Employees = returnArr;
-          } catch (e) {
-            console.log(e);
-          }
-        });
-      });
-
-      await this.$fireDb.ref("attendance").once("value", function(snapshot) {
-        let returnArr = [];
-        snapshot.forEach(function(childSnapshot) {
-          try {
-            var childKey = childSnapshot.key;
-            var childData = childSnapshot.val();
-
-            var item = {
-              code: childKey,
-              name: childData.name,
-              date: self.getDate(childData.date),
-              location: childData.location,
-              Location: self.getLocation(childData.location),
-              Employee: self.getEmployee(childData.employee),
-              phoneNumber: childData.phoneNumber,
-              type: childData.type,
-              status: self.getStatus(childData),
-              geoValidade: self.getGeoStatus(childData)
-            };
-
-            returnArr.push(item);
-
-            self.data.push({
-              location: item.Location.name,
-              date: item.date,
-              employee: item.Employee.name,
-              phoneNumber: item.phoneNumber,
-              type: item.type,
-              status: item.status,
-              geoValidade: item.geoValidade
-            });
-
-            self.Items = returnArr;
-            self.Attendance = returnArr;
-          } catch (e) {
-            console.log(e);
-          }
-        });
-      });
     } catch (e) {
       console.log(e);
 
@@ -294,6 +208,7 @@ export default {
         "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
       );
     }
+    this.loading = !this.loading;
   },
 
   methods: {
@@ -311,7 +226,10 @@ export default {
     getStatus(item) {
       //Extra Hour 100% Extra Hour 50% Missed Delay Early
 
-      var Location = this.getLocation(item.location);
+      var Location = this.getLocation(item.locationId);
+
+      if (!Location) return "Error Location";
+
       var hour = item.date.hour;
       var minute = item.date.minute;
 
@@ -359,7 +277,9 @@ export default {
     getGeoStatus(item) {
       //Extra Hour 100% Extra Hour 50% Missed Delay Early
 
-      var Location = this.getLocation(item.location);
+      var Location = this.getLocation(item.locationId);
+
+      if (!Location) return "Error Location";
 
       var distance = getDistance(
         { latitude: Location.position.lat, longitude: Location.position.lng },
@@ -379,34 +299,84 @@ export default {
       return item.split(" ")[i];
     },
 
-    async postData() {
-      axios
-        .post("https://mahotacrm.firebaseio.com/attendance.json", {
-          period: "This Week",
-          name: "Guimarães Mahota",
-          monday: "Early",
-          tuesday: "Early",
-          wednesday: "Late",
-          thursday: "Absent",
-          friday: "",
-          saturday: "",
-          sunday: "",
-          totalDayEarly: 2,
-          totalDayLate: 1,
-          totalAbsent: 1
-        })
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => console.log(error));
-    },
+    async getData() {
+      try {
+        this.Items = [];
+        this.Employees = [];
+        this.data = [];
+        let self = this;
 
-    async getData() {},
+        await this.$fireDb
+          .ref("employee")
+          // .orderByChild("location")
+          // .equalTo(self.location)
+          .once("value", function(snapshot) {
+            let returnArr = [];
+            snapshot.forEach(function(childSnapshot) {
+              try {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
 
-    async initData() {
-      this.loading = !this.loading;
-      this.getData();
-      this.loading = !this.loading;
+                var item = {
+                  code: childKey,
+                  name: childData.name,
+                  status: childData.status
+                };
+
+                returnArr.push(item);
+
+                self.Employees = returnArr;
+              } catch (e) {
+                console.log(e);
+              }
+            });
+          });
+
+        await this.$fireDb
+          .ref("attendance")
+          .orderByChild("locationId")
+          .equalTo(self.location)
+          .once("value", function(snapshot) {
+            let returnArr = [];
+            snapshot.forEach(function(childSnapshot) {
+              try {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
+
+                var item = {
+                  code: childKey,
+                  name: childData.name,
+                  date: self.getDate(childData.date),
+                  location: childData.location,
+                  name:childData.name,
+                  Location: self.getLocation(childData.locationId),
+                  Employee: self.getEmployee(childData.employee),
+                  phoneNumber: childData.phoneNumber,
+                  type: childData.type,
+                  status: self.getStatus(childData),
+                  geoValidade: self.getGeoStatus(childData)
+                };
+
+                returnArr.push(item);
+
+                self.data.push({
+                  location: item.location,
+                  date: item.date,
+                  employee: name,
+                  phoneNumber: item.phoneNumber,
+                  type: item.type,
+                  status: item.status,
+                  geoValidade: item.geoValidade
+                });
+
+                self.Items = returnArr;
+                self.Attendance = returnArr;
+              } catch (e) {
+                console.log(e);
+              }
+            });
+          });
+      } catch (e) {}
     },
 
     getColor(item) {
@@ -425,32 +395,27 @@ export default {
           return "danger";
       }
     },
-    getDate(item) {
-      var value = new Date(
-        item.year,
-        item.monthValue,
-        item.dayOfMonth,
-        item.hour,
-        item.minute,
-        item.second,
-        997
-      ).toISOString();
 
-      return this.$moment(String(value)).format("MM/DD/YYYY hh:mm a");
+    getDate(item) {
+      if (!item.year) {
+        return this.$moment(item).format("MM/DD/YYYY hh:mm a");
+      } else {
+        return this.$moment({
+          y: item.year,
+          M: item.monthValue - 1,
+          d: item.dayOfMonth,
+          h: item.hour,
+          m: item.minute,
+          s: item.second,
+          ms: 0
+        }).format();
+      }
     },
 
     getFuncionario(item) {},
 
-    async createUser() {
-      try {
-        console.log("Foo");
-        await this.$fireAuth.createUserWithEmailAndPassword(
-          "foo@foo.foo",
-          "test"
-        );
-      } catch (e) {
-        handleError(e);
-      }
+    async calculate() {
+      this.getData();
     }
   },
   computed: {

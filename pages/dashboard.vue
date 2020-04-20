@@ -58,7 +58,7 @@
 
 <script>
 import materialStatsCard from "~/components/material/AppStatsCard";
-import maps from "~/components/base/location/Maps"
+import maps from "~/components/base/location/Maps";
 
 import * as geolib from "geolib";
 import getDistance from "geolib/es/getDistance";
@@ -270,52 +270,68 @@ export default {
           });
         });
 
-        await this.$fireDb.ref("attendance").once("value", function(snapshot) {
-          let returnArr = [];
-          snapshot.forEach(function(childSnapshot) {
-            try {
-              var childKey = childSnapshot.key;
-              var childData = childSnapshot.val();
+        await this.$fireDb
+          .ref("attendance")
+          .orderByChild("date")
+          .startAt(this.$moment().format("YYYY-MM-DD"))
+          .once("value", function(snapshot) {
+            let returnArr = [];
+            snapshot.forEach(function(childSnapshot) {
+              try {
+                var childKey = childSnapshot.key;
+                var childData = childSnapshot.val();
 
-              var item = {
-                code: childKey,
-                name: childData.name,
-                date: self.getDate(childData.date),
-                location: childData.location,
-                Location: self.getLocation(childData.location),
-                //Employee: self.getEmployee(childData.employee),
-                phoneNumber: childData.phoneNumber,
-                type: childData.type,
-                status: self.getStatus(childData),
-                geoValidade: self.getGeoStatus(childData)
-              };
+                var item = {
+                  code: childKey,
+                  name: childData.name,
+                  date: self.getDate(childData.date),
+                  location: childData.location,
+                  Location: self.getLocation(childData.locationId),
+                  phoneNumber: childData.phoneNumber,
+                  type: childData.type,
+                  status: self.getStatus(childData),
+                  geoValidade: self.getGeoStatus(childData)
+                };
 
-              returnArr.push(item);
+                returnArr.push(item);
+              } catch (e) {
+                console.log(e);
+              }
+            });
 
-              self.Attendance.Early =
-                self.Attendance.Total / self.Attendance.Early;
-              self.Attendance.Late =
-                self.Attendance.Total / self.Attendance.Late;
-              self.Attendance.Absent =
-                self.Attendance.Total / self.Attendance.Absent;
+            self.Attendance.Early =
+              self.Attendance.Total > 0
+                ? Math.round(
+                    (self.Attendance.Early / self.Attendance.Total) * 100,
+                    0
+                  )
+                : 0;
+            self.Attendance.Late =
+              self.Attendance.Total > 0
+                ? Math.round(
+                    (self.Attendance.Late / self.Attendance.Total) * 100,
+                    0
+                  )
+                : 0;
+            self.Attendance.Absent =
+              self.Attendance.Total > 0
+                ? Math.round(
+                    (self.Attendance.Absent / self.Attendance.Total) * 100,
+                    0
+                  )
+                : 0;
 
-              self.Attendance._Early = self.Attendance.Early.toFixed(
-                0
-              ).toString();
-              self.Attendance._Late = self.Attendance.Late.toFixed(
-                0
-              ).toString();
-              self.Attendance._Absent = 0; //self.Attendance.Absent.toString();
-              self.Attendance._Total = self.Attendance.Total.toFixed(
-                0
-              ).toString();
+            self.Attendance._Early = self.Attendance.Early.toFixed(
+              0
+            ).toString();
+            self.Attendance._Late = self.Attendance.Late.toFixed(0).toString();
+            self.Attendance._Absent = 0;
+            self.Attendance._Total = self.Attendance.Total.toFixed(
+              0
+            ).toString();
 
-              self.Items = returnArr;
-            } catch (e) {
-              console.log(e);
-            }
+            self.Items = returnArr;
           });
-        });
 
         await this.$fireDb.ref("employee").once("value", function(snapshot) {
           let returnArr = [];
@@ -367,7 +383,7 @@ export default {
     getStatus(item) {
       //Extra Hour 100% Extra Hour 50% Missed Delay Early
 
-      var Location = this.getLocation(item.location);
+      var Location = this.getLocation(item.locationId);
       var hour = item.date.hour;
       var minute = item.date.minute;
 
@@ -419,7 +435,7 @@ export default {
     getGeoStatus(item) {
       //Extra Hour 100% Extra Hour 50% Missed Delay Early
 
-      var Location = this.getLocation(item.location);
+      var Location = this.getLocation(item.locationId);
 
       var distance = getDistance(
         { latitude: Location.position.lat, longitude: Location.position.lng },
@@ -455,17 +471,7 @@ export default {
       }
     },
     getDate(item) {
-      var value = new Date(
-        item.year,
-        item.monthValue,
-        item.dayOfMonth,
-        item.hour,
-        item.minute,
-        item.second,
-        997
-      ).toISOString();
-
-      return this.$moment(String(value)).format("MM/DD/YYYY hh:mm a");
+      return this.$moment(item).format("MM/DD/YYYY hh:mm a");
     },
 
     getFuncionario(item) {},

@@ -161,7 +161,7 @@ export default {
           this.$forceUpdate();
           break;
         case 4:
-          this.$router.push(`/reports/quick?location=` + loc.code);
+          this.$router.push(`/reports?location=` + loc.code);
           this.$forceUpdate();
           break;
         case 5:

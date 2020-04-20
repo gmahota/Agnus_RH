@@ -253,7 +253,7 @@ export default {
         jobTitle: "",
         notes: "",
         location: this.locationKey,
-        status: null
+        status: "Inveted"
       };
 
       this.dialog = true;
