@@ -81,6 +81,12 @@ export default {
           to: "/locations",
           icon: "mdi-file-document-outline",
           text: "Localizações"
+        },
+
+        {
+          to: "/users",
+          icon: "mdi-account-multiple",
+          text: "Utilizadores"
         }
 
         // {
