@@ -6,17 +6,17 @@
           <material-card
             color="success"
             elevation="12"
-            title="Connexion"
+            title="Sign In into your account"
           >
             <v-card-text>
               <v-form>
-                <v-text-field type="text" v-model="username" prepend-icon="person" name="username" label="Login" :placeholder="defaultUserPassword"></v-text-field>
-                <v-text-field type="password" v-model="password" prepend-icon="lock" name="password" label="Password" :placeholder="defaultUserPassword"></v-text-field>
+                <v-text-field type="email" v-model="email" prepend-icon="person" name="email" label="Login" placeholder="your@email.com"></v-text-field>
+                <v-text-field type="password" v-model="password" prepend-icon="lock" name="password" label="Password" placeholder="password"></v-text-field>
               </v-form>
             </v-card-text>
             <v-card-actions>
               <v-layout justify-center align-center>
-                <v-btn color="success" :disabled="isDisabled" @click.prevent="authenticate">Login</v-btn>
+                <v-btn color="success" :disabled="isDisabled" @click.prevent="authenticate">Sign In</v-btn>
               </v-layout>
             </v-card-actions>
           </material-card>
@@ -36,27 +36,31 @@
     },
     data() {
       return {
-        username: 'admin',
-        password: 'admin',
+        email: null,
+        password: null,
         defaultUserPassword: 'admin'
       }
     },
     computed: {
       isDisabled() {
-        return this.username !== this.defaultUserPassword || this.password !== this.defaultUserPassword;
+        return (this.email && this.password) ? false : true
       }
     },
     methods: {
       ...mapActions({
-        setUsername: 'user/setUsername'
+        setEmail: 'user/setUsername'
       }),
 
       async authenticate() {
         if (!this.isDisabled) {
-          await this.setUsername(this.defaultUserPassword);
           //this.$router.push({ path: 'dashboard' });
-          this.$router.push({ name:'dashboard' }, () => this.$router.go(0));
-          this.$forceUpdate();
+          this.$fireAuth.signInWithEmailAndPassword(this.email, this.password)
+          .then(async credentials => {             
+            console.log(credentials.user)
+            await this.setEmail(credentials.user.email); 
+            this.$router.push({ name:'dashboard' }, () => this.$router.go(0));
+            this.$forceUpdate();
+          })
         }
       }
     }

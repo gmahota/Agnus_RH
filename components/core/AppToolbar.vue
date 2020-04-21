@@ -131,7 +131,7 @@
     },
     methods: {
       ...mapActions({
-        setUsername: 'user/setUsername',
+        setEmail: 'user/setUsername',
         setDrawer: 'app/setDrawer'
       }),
 
@@ -151,8 +151,12 @@
         }
       },
       async logout() {
-        await this.setUsername(null);
-        this.$router.push({ path: '/' });
+        await this.setEmail({ user: null });
+        this.$fireAuth.signOut().then(() => {
+          console.log('The user signed out');
+          this.$router.push({ path: '/' });}
+        )
+        
       }
     },
     mounted () {
