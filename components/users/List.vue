@@ -29,7 +29,7 @@
               <v-container>
                 <v-row>
                   <v-col cols="12" sm="6" md="6">
-                    <v-text-field v-model="editedItem.name" label="Nome"></v-text-field>
+                    <v-text-field v-model="editedItem.displayName" label="Nome"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
@@ -46,7 +46,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="createAuthUser()">Save</v-btn>
+              <v-btn color="blue darken-1" :loading="onSavingData" text @click="save()">Save</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -67,26 +67,27 @@ export default {
   data: () => ({
     dialog: false,
     loading: false,
+    onSavingData: false,
     headers: [
-      { text: "Nome", value: "name" },
+      { text: "Nome", value: "displayName" },
       { text: "Email", value: "email" },
       { text: "Celular", value: "phoneNumber" },
-      { text: "Estado", value: "status" }
+      //{ text: "Estado", value: "photoURL" }
     ],
     users: [],
     user: {},
     editedIndex: -1,
     editedItem: {
-      name: "",
+      displayName: "",
       email: "",
       phoneNumber: "",
-      status: ""
+      photoURL: ""
     },
     defaultItem: {
-      name: "",
+      displayName: "",
       email: "",
       phoneNumber: "",
-      status: ""
+      photoURL: ""
     }
   }),
 
@@ -108,13 +109,18 @@ export default {
 
   methods: {
     createAuthUser() {
+      this.onSavingData = true
+      
       this.$fireAuth
         .createUserWithEmailAndPassword(
-          editedItem.email,
-          editedItem.password
+          this.editedItem.email,
+          this.editedItem.password
         )
         .then(credentials => {
           console.log(credentials.user);
+          this.users.push(credentials.user.providerData[0])
+          this.onSavingData = false
+          this.close();
         });
     },
 
@@ -145,10 +151,7 @@ export default {
         Object.assign(this.users[this.editedIndex], this.editedItem);
       } else {
         this.createAuthUser();
-        this.users.push(this.editedItem);
-
       }
-      this.close();
     }
   }
 };
