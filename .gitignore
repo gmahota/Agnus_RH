@@ -65,7 +65,7 @@ typings/
 # next.js build output
 .next
 
-# nuxt.js build output
+# js build output
 .nuxt
 
 # Nuxt generate
@@ -83,7 +83,5 @@ dist
 
 # Service worker
 sw.*
-
-#nuxt.config.js
 
 report.*
