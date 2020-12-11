@@ -7,5 +7,11 @@ export default {
   },
   setColor({commit}, color) {
     commit('SET_COLOR', color);
+  },
+  setStatus({commit}, status){
+    commit('SET_STATUS',status)
+  },
+  setError({commit}, status){
+    commit('SET_ERROR',status)
   }
 }

@@ -7,5 +7,12 @@ export default {
   },
   SET_COLOR(state, color) {
     state.color = color;
+  },
+
+  SET_STATUS(state, status) {
+    state.status = status;
+  },
+  SET_ERROR(state, error) {
+    state.error = error;
   }
-}
+};

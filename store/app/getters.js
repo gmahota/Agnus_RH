@@ -9,5 +9,12 @@ export default {
 
   getDrawer(state) {
     return state.drawer;
+  },
+
+  getStatus(state){
+    return state.status;
+  },
+  getError(state){
+    return state.error;
   }
 }

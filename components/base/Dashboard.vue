@@ -7,7 +7,7 @@
         <v-btn text small color="primary" @click="addLocation">+ Nova Localização</v-btn>
       </v-flex>
       <v-spacer></v-spacer>
-      <v-flex md4 sm4 lg4 v-for="loc in Locations" :key="loc.code">
+      <v-flex md4 sm4 lg4 v-for="loc in Locations" :key="loc.id">
         <v-card class="mx-auto">
           <v-card-title>
             <v-icon>mdi-map-marker</v-icon>
@@ -44,7 +44,7 @@
                   <v-list-item-title>Funcionarios</v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                  {{loc.employees}}
+                  {{getCountEmployee(loc.id)}}
                   <!-- <v-icon >chat_bubble</v-icon> -->
                 </v-list-item-action>
               </v-list-item>
@@ -68,12 +68,13 @@
 </template>
 
 <script>
-import axios from "axios";
+// Utilities
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   data: () => ({
     location: "",
-    Locations: [],
+    //Locations: [],
     items: [
       { id: 1, title: "Invite Employees", icon: "mdi-dialpad" },
       { id: 2, title: "Edit Locations", icon: "mdi-pencil" },
@@ -83,18 +84,17 @@ export default {
       { id: 6, title: "Delete", icon: "mdi-delete" }
     ]
   }),
-  async beforeMount() {
-    try {
-      this.getLocation();
-    } catch (e) {
-      console.log(e);
-
-      alert(
-        "Ocorreu um erro durante a gravação da localização. Contacte os Administradores do Sistema!!"
-      );
+  computed: {
+    Locations() {
+      return this.$store.state.location.Locations;
     }
+    // ...mapState({
+    //   Locations: state => state.location.Locations
+    // })
   },
-
+  async fetch() {
+    await this.$store.dispatch("location/loadAllLocations");
+  },
   methods: {
     async getLocation() {
       try {
@@ -102,37 +102,12 @@ export default {
 
         let self = this;
 
-        await this.$fireDb.ref("location").once("value", function(snapshot) {
-          let returnArr = [];
-          snapshot.forEach(function(childSnapshot) {
-            try {
-              var childKey = childSnapshot.key;
-              var childData = childSnapshot.val();
-
-              var item = {
-                code: childKey,
-                employees: 0,
-                clockIn: 0,
-                location: childData
-              };
-
-              returnArr.push(item);
-
-
-            } catch (e) {
-              console.log(e);
-            }
-          });
-
-          self.Locations = returnArr;
-        });
-
         for (var i = 0; i < this.Locations.length; i++) {
           var item = this.Locations[i];
-          await self.getCount(item.code).then(resolve => {
+          await self.getCount(item.id).then(resolve => {
             this.Locations[i].employees = resolve;
           });
-          await self.getCountPickTime(item.code).then(resolve => {
+          await self.getCountPickTime(item.id).then(resolve => {
             this.Locations[i].clockIn = resolve;
           });
         }
@@ -151,23 +126,23 @@ export default {
     async menuAction(item, loc) {
       switch (item.id) {
         case 1:
-          this.$router.push(`/location/employees?location=` + loc.code);
+          this.$router.push(`/location/employees?location=` + loc.id);
           this.$forceUpdate();
           break;
         case 2:
           break;
         case 3:
-          this.$router.push(`/location/employees?location=` + loc.code);
+          this.$router.push(`/location/employees?location=` + loc.id);
           this.$forceUpdate();
           break;
         case 4:
-          this.$router.push(`/reports?location=` + loc.code);
+          this.$router.push(`/reports?location=` + loc.id);
           this.$forceUpdate();
           break;
         case 5:
           break;
         case 6:
-          let locationRef = this.$fireDb.ref('location/' + loc.code);
+          let locationRef = this.$fireDb.ref("location/" + loc.id);
 
           locationRef.remove();
 
@@ -177,21 +152,20 @@ export default {
       }
     },
 
-    async getCount(locationId) {
+    async getCountEmployee(locationId) {
       let count = 0;
+      var employees = [];
 
-      var ref = this.$fireDb.ref("employee");
-
-      var a = await ref
-        .orderByChild("location")
-        .equalTo(locationId)
-        .once("value", function(snapshot) {
-          snapshot.forEach(function(childSnapshot) {
-            count++;
-          });
+      await this.Locations.forEach((value, index) => {
+        this.$store.dispatch("location/getAllEmployee", {
+          locationId: value.id,
+          Employees: employees
         });
+      });
 
-      return count;
+      console.log(employees);
+
+      return employees.length;
     },
 
     async getCountPickTime(locationId) {
@@ -224,17 +198,7 @@ export default {
       return count;
     },
 
-    async getData() {},
-
-    async initData() {
-      this.loading = !this.loading;
-      this.getData();
-      this.loading = !this.loading;
-    }
-  },
-
-  created() {
-    this.initData();
+    async getData() {}
   }
 };
 </script>

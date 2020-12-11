@@ -1,3 +1,6 @@
 export default () => ({
-  Locations : []
+  Locations : [],
+  location:null
 })
+
+

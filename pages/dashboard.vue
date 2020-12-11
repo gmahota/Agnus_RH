@@ -180,41 +180,7 @@ export default {
         }
       ],
       items: [
-        {
-          name: "Dakota Rice",
-          country: "Mozambique",
-          city: "Sofala",
-          location: "Sofala - Localizao 1",
-          salary: "$35,738"
-        },
-        {
-          name: "Minerva Hooper",
-          country: "Mozambique",
-          city: "Nampula",
-          location: "Nampula",
-          salary: "$23,738"
-        },
-        {
-          name: "Sage Rodriguez",
-          country: "Mozambique",
-          city: "Xai-xai",
-          location: "Xai-xai",
-          salary: "$56,142"
-        },
-        {
-          name: "Philip Chanley",
-          country: "Mozambique",
-          city: "Maputo",
-          location: "Maputo - Sede",
-          salary: "$38,735"
-        },
-        {
-          name: "Doris Greene",
-          country: "Malawi",
-          city: "Matola - Filial 1",
-          location: "Matola",
-          salary: "$63,542"
-        }
+
       ],
       tabs: 0,
       list: {
@@ -339,6 +305,7 @@ export default {
             try {
               var childKey = childSnapshot.key;
               var childData = childSnapshot.val();
+
               var item = {
                 code: childKey,
                 name: childData.name,
@@ -474,19 +441,7 @@ export default {
       return this.$moment(item).format("MM/DD/YYYY hh:mm a");
     },
 
-    getFuncionario(item) {},
-
-    async createUser() {
-      try {
-        console.log("Foo");
-        await this.$fireAuth.createUserWithEmailAndPassword(
-          "foo@foo.foo",
-          "test"
-        );
-      } catch (e) {
-        handleError(e);
-      }
-    }
+    getFuncionario(item) {}
   },
   created() {
     this.initData();
