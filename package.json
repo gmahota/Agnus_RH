@@ -24,7 +24,7 @@
     "font-awesome": "^4.7.0",
     "geolib": "^3.2.1",
     "lodash.truncate": "^4.4.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "nuxt": "^2.13.0",
     "nuxt-validate": "^1.0.1",
     "nuxtjs-mdi-font": "^1.0.2",
