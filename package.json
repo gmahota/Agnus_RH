@@ -19,7 +19,7 @@
     "@nuxtjs/firebase": "^5.0.7",
     "@nuxtjs/pwa": "^3.0.0-beta.19",
     "cross-env": "^6.0.3",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "firebase": "^7.13.2",
     "font-awesome": "^4.7.0",
     "geolib": "^3.2.1",
